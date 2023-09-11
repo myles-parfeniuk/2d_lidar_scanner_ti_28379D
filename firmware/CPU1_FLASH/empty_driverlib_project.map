@@ -1,0 +1,707 @@
+******************************************************************************
+             TMS320C2000 Linker PC v22.6.0                     
+******************************************************************************
+>> Linked Sun Sep 10 17:07:54 2023
+
+OUTPUT FILE NAME:   <empty_driverlib_project.out>
+ENTRY POINT SYMBOL: "code_start"  address: 00080000
+
+
+MEMORY CONFIGURATION
+
+         name            origin    length      used     unused   attr    fill
+----------------------  --------  ---------  --------  --------  ----  --------
+PAGE 0:
+  RAMM0                 00000123   000002dd  00000000  000002dd  RWIX
+  RAMLS0                00008000   00000800  00000128  000006d8  RWIX
+  RAMLS1                00008800   00000800  00000000  00000800  RWIX
+  RAMLS2                00009000   00000800  00000000  00000800  RWIX
+  RAMLS3                00009800   00000800  00000000  00000800  RWIX
+  RAMLS4                0000a000   00000800  00000000  00000800  RWIX
+  RAMD0                 0000b000   00000800  00000000  00000800  RWIX
+  RAMGS14               0001a000   00001000  00000000  00001000  RWIX
+  RAMGS15               0001b000   00000ff8  00000000  00000ff8  RWIX
+  BEGIN                 00080000   00000002  00000002  00000000  RWIX
+  FLASHA                00080002   00001ffe  00000000  00001ffe  RWIX
+  FLASHB                00082000   00002000  00002000  00000000  RWIX
+  FLASHC                00084000   00002000  000005e9  00001a17  RWIX
+  FLASHD                00086000   00002000  00000128  00001ed8  RWIX
+  FLASHE                00088000   00008000  00000000  00008000  RWIX
+  FLASHF                00090000   00008000  000006c5  0000793b  RWIX
+  FLASHG                00098000   00008000  00000000  00008000  RWIX
+  FLASHH                000a0000   00008000  00000000  00008000  RWIX
+  FLASHI                000a8000   00008000  00000000  00008000  RWIX
+  FLASHJ                000b0000   00008000  00000000  00008000  RWIX
+  FLASHK                000b8000   00002000  00000000  00002000  RWIX
+  FLASHL                000ba000   00002000  00000000  00002000  RWIX
+  FLASHM                000bc000   00002000  00000000  00002000  RWIX
+  FLASHN                000be000   00001ff0  00000000  00001ff0  RWIX
+  RESET                 003fffc0   00000002  00000000  00000002  RWIX
+
+PAGE 1:
+  BOOT_RSVD             00000002   00000121  00000000  00000121  RWIX
+  RAMM1                 00000400   000003f8  00000100  000002f8  RWIX
+  RAMLS5                0000a800   00000800  0000004a  000007b6  RWIX
+  RAMD1                 0000b800   00000800  00000000  00000800  RWIX
+  RAMGS0                0000c000   00001000  00000000  00001000  RWIX
+  RAMGS1                0000d000   00001000  00000000  00001000  RWIX
+  RAMGS2                0000e000   00001000  00000000  00001000  RWIX
+  RAMGS3                0000f000   00001000  00000000  00001000  RWIX
+  RAMGS4                00010000   00001000  00000000  00001000  RWIX
+  RAMGS5                00011000   00001000  00000000  00001000  RWIX
+  RAMGS6                00012000   00001000  00000000  00001000  RWIX
+  RAMGS7                00013000   00001000  00000000  00001000  RWIX
+  RAMGS8                00014000   00001000  00000000  00001000  RWIX
+  RAMGS9                00015000   00001000  00000000  00001000  RWIX
+  RAMGS10               00016000   00001000  00000000  00001000  RWIX
+  RAMGS11               00017000   00001000  00000000  00001000  RWIX
+  RAMGS12               00018000   00001000  00000000  00001000  RWIX
+  RAMGS13               00019000   00001000  00000000  00001000  RWIX
+  CPU2TOCPU1RAM         0003f800   00000400  00000000  00000400  RWIX
+  CPU1TOCPU2RAM         0003fc00   00000400  00000000  00000400  RWIX
+
+
+SECTION ALLOCATION MAP
+
+ output                                  attributes/
+section   page    origin      length       input sections
+--------  ----  ----------  ----------   ----------------
+codestart 
+*          0    00080000    00000002     
+                  00080000    00000002     F2837xD_CodeStartBranch.obj (codestart)
+
+.cinit     0    000845d0    0000001c     
+                  000845d0    00000009     (.cinit..data.load) [load image, compression = lzss]
+                  000845d9    00000001     --HOLE-- [fill = 0]
+                  000845da    00000006     (__TI_handler_table)
+                  000845e0    00000004     (.cinit..bss.load) [load image, compression = zero_init]
+                  000845e4    00000008     (__TI_cinit_table)
+
+.stack     1    00000400    00000100     UNINITIALIZED
+                  00000400    00000100     --HOLE--
+
+.reset     0    003fffc0    00000000     DSECT
+
+.init_array 
+*          0    00082000    00000000     UNINITIALIZED
+
+.bss       1    0000a800    00000038     UNINITIALIZED
+                  0000a800    00000028     main.obj (.bss:disp_buff)
+                  0000a828    00000009     main.obj (.bss:rxDistance)
+                  0000a831    00000001     --HOLE--
+                  0000a832    00000006     main.obj (.bss)
+
+.data      1    0000a838    00000012     UNINITIALIZED
+                  0000a838    00000006     device.obj (.data)
+                  0000a83e    00000002     rts2800_fpu32_eabi.lib : _lock.c.obj (.data:_lock)
+                  0000a840    00000006                            : exit.c.obj (.data)
+                  0000a846    00000002                            : _lock.c.obj (.data:_unlock)
+                  0000a848    00000001     main.obj (.data)
+                  0000a849    00000001     rts2800_fpu32_eabi.lib : errno.c.obj (.data)
+
+.const     0    00090000    000006c5     
+                  00090000    00000101     rts2800_fpu32_eabi.lib : ctype.c.obj (.const:.string:_ctypes_)
+                  00090101    00000001     --HOLE-- [fill = 0]
+                  00090102    000000c2     driverlib_eabi.lib : sysctl.obj (.const:.string)
+                  000901c4    000000bf                        : flash.obj (.const:.string)
+                  00090283    00000001     --HOLE-- [fill = 0]
+                  00090284    000000bc                        : gpio.obj (.const:.string)
+                  00090340    000000bb                        : sci.obj (.const:.string)
+                  000903fb    00000001     --HOLE-- [fill = 0]
+                  000903fc    00000063                        : interrupt.obj (.const:.string)
+                  0009045f    00000001     --HOLE-- [fill = 0]
+                  00090460    00000062                        : cputimer.obj (.const:.string)
+                  000904c2    0000005d                        : i2c.obj (.const:.string)
+                  0009051f    00000001     --HOLE-- [fill = 0]
+                  00090520    0000004f     main.obj (.const:.string)
+                  0009056f    00000001     --HOLE-- [fill = 0]
+                  00090570    00000048     28739D_timer.obj (.const:.string)
+                  000905b8    00000043     28379D_i2c.obj (.const:.string)
+                  000905fb    00000001     --HOLE-- [fill = 0]
+                  000905fc    00000043     28379D_uart.obj (.const:.string)
+                  0009063f    00000001     --HOLE-- [fill = 0]
+                  00090640    00000026     rts2800_fpu32_eabi.lib : _printfi.c.obj (.const:.string)
+                  00090666    0000001c                            : _printfi.c.obj (.const)
+                  00090682    0000001c                            : s_scalbn.c.obj (.const)
+                  0009069e    00000013     device.obj (.const:.string)
+                  000906b1    00000001     --HOLE-- [fill = 0]
+                  000906b2    00000008     rts2800_fpu32_eabi.lib : s_frexp.c.obj (.const)
+                  000906ba    00000006     main.obj (.const:lidar_frame_rate_cmd)
+                  000906c0    00000005     main.obj (.const:lidar_cmd_distance)
+
+.TI.ramfunc 
+*          0    00086000    00000128     RUN ADDR = 00008000
+                  00086000    00000043     driverlib_eabi.lib : flash.obj (.TI.ramfunc:Flash_initModule)
+                  00086043    0000002c                        : flash.obj (.TI.ramfunc:Flash_setBankPowerMode)
+                  0008606f    00000024                        : flash.obj (.TI.ramfunc:Flash_setWaitstates)
+                  00086093    0000001d                        : flash.obj (.TI.ramfunc:Flash_setPumpPowerMode)
+                  000860b0    00000018                        : flash.obj (.TI.ramfunc:Flash_disableCache)
+                  000860c8    00000018                        : flash.obj (.TI.ramfunc:Flash_disablePrefetch)
+                  000860e0    00000017                        : flash.obj (.TI.ramfunc:Flash_enableCache)
+                  000860f7    00000017                        : flash.obj (.TI.ramfunc:Flash_enablePrefetch)
+                  0008610e    00000016                        : flash.obj (.TI.ramfunc:Flash_enableECC)
+                  00086124    00000004                        : sysctl.obj (.TI.ramfunc)
+
+GETBUFFER 
+*          0    0003f800    00000000     DSECT
+
+GETWRITEIDX 
+*          0    0003f800    00000000     DSECT
+
+PUTREADIDX 
+*          0    0003f800    00000000     DSECT
+
+.text.1    0    00082000    00002000     
+                  00082000    000006c2     rts2800_fpu32_eabi.lib : _printfi.c.obj (.text)
+                  000826c2    00000614                            : _printfi.c.obj (.text:__TI_printfi)
+                  00082cd6    00000206     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_setClock)
+                  00082edc    00000107     rts2800_fpu32_eabi.lib : ll_div28.asm.obj (.text)
+                  00082fe3    000000eb     device.obj (.text:Device_enableAllPeripherals)
+                  000830ce    000000a9     rts2800_fpu32_eabi.lib : s_scalbn.c.obj (.text)
+                  00083177    0000009c                            : fd_add28.asm.obj (.text)
+                  00083213    0000008b                            : fd_div28.asm.obj (.text)
+                  0008329e    0000008a     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_selectXTAL)
+                  00083328    00000088     rts2800_fpu32_eabi.lib : fs_div28.asm.obj (.text)
+                  000833b0    00000083                            : fd_mpy28.asm.obj (.text)
+                  00083433    0000007f     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_clearIFR)
+                  000834b2    00000076     main.obj (.text:lidar_sampler_ISR)
+                  00083528    0000006d     28739D_timer.obj (.text:timer_init)
+                  00083595    00000068     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_getDeviceParametric)
+                  000835fd    00000064                        : i2c.obj (.text:I2C_initController)
+                  00083661    0000005d     28379D_i2c.obj (.text:i2c_init)
+                  000836be    0000005a     rts2800_fpu32_eabi.lib : s_frexp.c.obj (.text)
+                  00083718    00000058     28379D_uart.obj (.text:uart_init)
+                  00083770    00000053     device.obj (.text:Device_init)
+                  000837c3    00000052     driverlib_eabi.lib : gpio.obj (.text:GPIO_setPadConfig)
+                  00083815    00000051                        : sysctl.obj (.text:SysCtl_getClock)
+                  00083866    0000004e                        : interrupt.obj (.text:Interrupt_disable)
+                  000838b4    00000048                        : sysctl.obj (.text:SysCtl_selectOscSource)
+                  000838fc    00000048     28379D_i2c.obj (.text:i2c_master_rx)
+                  00083944    00000048     main.obj (.text:main)
+                  0008398c    00000048     28739D_timer.obj (.text:timer_set_freq)
+                  000839d4    00000045     driverlib_eabi.lib : sci.obj (.text:SCI_clearInterruptStatus)
+                  00083a19    0000003e                        : sci.obj (.text:SCI_setConfig)
+                  00083a57    0000003d                        : interrupt.obj (.text:Interrupt_initModule)
+                  00083a94    0000003c     28379D_i2c.obj (.text:i2c_master_tx)
+                  00083ad0    00000037     driverlib_eabi.lib : gpio.obj (.text:GPIO_setControllerCore)
+                  00083b07    00000037                        : gpio.obj (.text:GPIO_setPinConfig)
+                  00083b3e    00000037                        : gpio.obj (.text:GPIO_setQualificationMode)
+                  00083b75    00000037                        : interrupt.obj (.text:Interrupt_enable)
+                  00083bac    00000032     rts2800_fpu32_eabi.lib : sprintf.c.obj (.text)
+                  00083bde    00000031     device.obj (.text:Device_configureTMXAnalogTrim)
+                  00083c0f    00000031     driverlib_eabi.lib : gpio.obj (.text:GPIO_setDirectionMode)
+                  00083c40    00000031     rts2800_fpu32_eabi.lib : atoi.c.obj (.text)
+                  00083c71    00000030                            : _ltoa.c.obj (.text)
+                  00083ca1    0000002e                            : copy_decompress_lzss.c.obj (.text:decompress:lzss)
+                  00083ccf    0000002b                            : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
+                  00083cfa    0000002a                            : fd_cmp28.asm.obj (.text)
+                  00083d24    0000002a                            : l_div28.asm.obj (.text)
+                  00083d4e    00000029                            : exit.c.obj (.text)
+                  00083d77    00000027     main.obj (.text:GPIO_writePin)
+                  00083d9e    00000026     driverlib_eabi.lib : flash.obj (.text:Flash_setBankPowerUpDelay)
+                  00083dc4    00000026     28379D_uart.obj (.text:SCI_setFIFOInterruptLevel)
+                  00083dea    00000024     rts2800_fpu32_eabi.lib : s_copysign.c.obj (.text)
+                  00083e0e    00000021     driverlib_eabi.lib : sysctl.obj (.text:CPUTimer_selectClockSource)
+                  00083e2f    00000021     device.obj (.text:Device_initGPIO)
+                  00083e50    00000021     driverlib_eabi.lib : i2c.obj (.text:I2C_getInterruptStatus)
+                  00083e71    00000021     rts2800_fpu32_eabi.lib : fd_toi28.asm.obj (.text)
+                  00083e92    0000001f     driverlib_eabi.lib : sysctl.obj (.text:CPUTimer_getTimerOverflowStatus)
+                  00083eb1    0000001f     main.obj (.text:GPIO_togglePin)
+                  00083ed0    0000001f     rts2800_fpu32_eabi.lib : fd_tol28.asm.obj (.text)
+                  00083eef    0000001e     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_initVectorTable)
+                  00083f0d    0000001e     rts2800_fpu32_eabi.lib : ll_cmp28.asm.obj (.text)
+                  00083f2b    0000001d     device.obj (.text:Device_enableUnbondedGPIOPullupsFor100Pin)
+                  00083f48    0000001d     28379D_uart.obj (.text:SCI_enableFIFO)
+                  00083f65    0000001d     rts2800_fpu32_eabi.lib : i_tofd28.asm.obj (.text)
+                  00083f82    0000001d                            : memcpy.c.obj (.text)
+                  00083f9f    0000001c                            : l_tofd28.asm.obj (.text)
+                  00083fbb    0000001b     28379D_i2c.obj (.text:I2C_setTargetAddress)
+                  00083fd6    0000001b     28379D_uart.obj (.text:SCI_isBaseValid)
+                  00083ff1    0000000f     28739D_timer.obj (.text:Interrupt_register)
+
+.text.2    0    00084000    000005cd     
+                  00084000    0000001b     driverlib_eabi.lib : sci.obj (.text:SCI_isBaseValid)
+                  0008401b    0000001a     28739D_timer.obj (.text:CPUTimer_startTimer)
+                  00084035    0000001a     driverlib_eabi.lib : sysctl.obj (.text:CPUTimer_startTimer)
+                  0008404f    0000001a     28379D_i2c.obj (.text:I2C_setAddressMode)
+                  00084069    0000001a     28379D_i2c.obj (.text:I2C_setBitCount)
+                  00084083    0000001a     28379D_i2c.obj (.text:I2C_setConfig)
+                  0008409d    0000001a     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_getLowSpeedClock)
+                  000840b7    00000018     28379D_i2c.obj (.text:I2C_disableFIFO)
+                  000840cf    00000018     driverlib_eabi.lib : sci.obj (.text:SCI_disableModule)
+                  000840e7    00000018     28379D_uart.obj (.text:SCI_performSoftwareReset)
+                  000840ff    00000018     driverlib_eabi.lib : sci.obj (.text:SCI_performSoftwareReset)
+                  00084117    00000018     28379D_uart.obj (.text:SCI_resetChannels)
+                  0008412f    00000018     28379D_uart.obj (.text:SCI_resetRxFIFO)
+                  00084147    00000018     28379D_uart.obj (.text:SCI_resetTxFIFO)
+                  0008415f    00000018     device.obj (.text:SysCtl_disablePeripheral)
+                  00084177    00000018     rts2800_fpu32_eabi.lib : ll_aox28.asm.obj (.text)
+                  0008418f    00000017     28739D_timer.obj (.text:CPUTimer_isBaseValid)
+                  000841a6    00000017     driverlib_eabi.lib : cputimer.obj (.text:CPUTimer_isBaseValid)
+                  000841bd    00000017                        : sysctl.obj (.text:CPUTimer_isBaseValid)
+                  000841d4    00000017     28739D_timer.obj (.text:CPUTimer_setPreScaler)
+                  000841eb    00000017     device.obj (.text:SysCtl_enablePeripheral)
+                  00084202    00000017     rts2800_fpu32_eabi.lib : boot28.asm.obj (.text)
+                  00084219    00000016     device.obj (.text:Device_enableUnbondedGPIOPullups)
+                  0008422f    00000015     28739D_timer.obj (.text:CPUTimer_enableInterrupt)
+                  00084244    00000015     device.obj (.text:GPIO_unlockPortConfig)
+                  00084259    00000014     28739D_timer.obj (.text:CPUTimer_reloadTimerCounter)
+                  0008426d    00000014     28739D_timer.obj (.text:CPUTimer_stopTimer)
+                  00084281    00000014     driverlib_eabi.lib : sysctl.obj (.text:CPUTimer_stopTimer)
+                  00084295    00000014     28379D_i2c.obj (.text:I2C_putData)
+                  000842a9    00000014     28379D_uart.obj (.text:SCI_getTxFIFOStatus)
+                  000842bd    00000014     28379D_uart.obj (.text:SCI_writeCharNonBlocking)
+                  000842d1    00000013     driverlib_eabi.lib : cputimer.obj (.text:CPUTimer_setEmulationMode)
+                  000842e4    00000013     device.obj (.text:Device_enableUnbondedGPIOPullupsFor176Pin)
+                  000842f7    00000013     28379D_i2c.obj (.text:I2C_disableLoopback)
+                  0008430a    00000013     28379D_i2c.obj (.text:I2C_disableModule)
+                  0008431d    00000013     28379D_i2c.obj (.text:I2C_enableModule)
+                  00084330    00000013     28379D_i2c.obj (.text:I2C_isBaseValid)
+                  00084343    00000013     driverlib_eabi.lib : i2c.obj (.text:I2C_isBaseValid)
+                  00084356    00000013     28379D_i2c.obj (.text:I2C_sendNACK)
+                  00084369    00000013     28379D_i2c.obj (.text:I2C_sendStartCondition)
+                  0008437c    00000013     28379D_i2c.obj (.text:I2C_sendStopCondition)
+                  0008438f    00000013     28379D_uart.obj (.text:SCI_clearOverflowStatus)
+                  000843a2    00000013     28379D_uart.obj (.text:SCI_enableModule)
+                  000843b5    00000013     driverlib_eabi.lib : sci.obj (.text:SCI_enableModule)
+                  000843c8    00000013     28379D_i2c.obj (.text:i2c_nack_check)
+                  000843db    00000012     driverlib_eabi.lib : sysctl.obj (.text:CPUTimer_clearOverflowFlag)
+                  000843ed    00000012                        : sysctl.obj (.text:CPUTimer_disableInterrupt)
+                  000843ff    00000012     28379D_i2c.obj (.text:I2C_clearStatus)
+                  00084411    00000012     28379D_i2c.obj (.text:I2C_setDataCount)
+                  00084423    00000011     28739D_timer.obj (.text:CPUTimer_setPeriod)
+                  00084434    00000011     driverlib_eabi.lib : sysctl.obj (.text:CPUTimer_setPeriod)
+                  00084445    00000011     28379D_uart.obj (.text:uart_tx_str)
+                  00084456    00000010     driverlib_eabi.lib : flash.obj (.text:Flash_isCtrlBaseValid)
+                  00084466    00000010                        : flash.obj (.text:Flash_isECCBaseValid)
+                  00084476    00000010     28379D_i2c.obj (.text:I2C_getData)
+                  00084486    00000010     28379D_i2c.obj (.text:I2C_getStatus)
+                  00084496    00000010     rts2800_fpu32_eabi.lib : memccpy.c.obj (.text)
+                  000844a6    0000000f     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_pollCpuTimer)
+                  000844b5    0000000f     28379D_uart.obj (.text:uart_tx_char)
+                  000844c4    0000000e     driverlib_eabi.lib : gpio.obj (.text:GPIO_isPinValid)
+                  000844d2    0000000e     main.obj (.text:GPIO_isPinValid)
+                  000844e0    0000000e     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_defaultHandler)
+                  000844ee    0000000e     rts2800_fpu32_eabi.lib : fd_sub28.asm.obj (.text)
+                  000844fc    0000000d     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_disableGlobal)
+                  00084509    0000000d                        : interrupt.obj (.text:Interrupt_enableGlobal)
+                  00084516    0000000d     main.obj (.text:Interrupt_enableGlobal)
+                  00084523    0000000d     device.obj (.text:SysCtl_setLowSpeedClock)
+                  00084530    0000000d     rts2800_fpu32_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset)
+                  0008453d    0000000c                            : args_main.c.obj (.text)
+                  00084549    0000000c                            : strchr.c.obj (.text)
+                  00084555    0000000b     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_isMCDClockFailureDetected)
+                  00084560    0000000b     rts2800_fpu32_eabi.lib : wcslen.c.obj (.text)
+                  0008456b    00000009     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_serviceWatchdog)
+                  00084574    00000009     rts2800_fpu32_eabi.lib : _lock.c.obj (.text)
+                  0008457d    00000009                            : fd_neg28.asm.obj (.text)
+                  00084586    00000008     F2837xD_CodeStartBranch.obj (.text)
+                  0008458e    00000008     device.obj (.text:SysCtl_disableWatchdog)
+                  00084596    00000008     rts2800_fpu32_eabi.lib : copy_decompress_none.c.obj (.text:decompress:none)
+                  0008459e    00000008                            : strlen.c.obj (.text)
+                  000845a6    00000007     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_resetMCD)
+                  000845ad    00000007     device.obj (.text:__error__)
+                  000845b4    00000007     rts2800_fpu32_eabi.lib : memset.c.obj (.text)
+                  000845bb    00000006     main.obj (.text:Interrupt_clearACKGroup)
+                  000845c1    00000005     rts2800_fpu32_eabi.lib : strcpy.c.obj (.text)
+                  000845c6    00000002     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_illegalOperationHandler)
+                  000845c8    00000002                        : interrupt.obj (.text:Interrupt_nmiHandler)
+                  000845ca    00000002     rts2800_fpu32_eabi.lib : pre_init.c.obj (.text)
+                  000845cc    00000001                            : startup.c.obj (.text)
+
+MODULE SUMMARY
+
+       Module                        code    ro data   rw data
+       ------                        ----    -------   -------
+    .\
+       28379D_i2c.obj                594     67        0      
+       28379D_uart.obj               388     67        0      
+       main.obj                      293     90        56     
+       28739D_timer.obj              346     72        0      
+    +--+-----------------------------+-------+---------+---------+
+       Total:                        1621    296       56     
+                                                              
+    .\device\
+       device.obj                    566     19        6      
+       F2837xD_CodeStartBranch.obj   10      0         0      
+    +--+-----------------------------+-------+---------+---------+
+       Total:                        576     19        6      
+                                                              
+    C:\ti\c2000\C2000Ware_5_00_00_00\driverlib\f2837xd\driverlib\ccs\Debug\driverlib_eabi.lib
+       sysctl.obj                    1175    194       0      
+       flash.obj                     654     191       0      
+       gpio.obj                      310     188       0      
+       interrupt.obj                 395     99        0      
+       sci.obj                       225     187       0      
+       i2c.obj                       152     93        0      
+       cputimer.obj                  42      98        0      
+    +--+-----------------------------+-------+---------+---------+
+       Total:                        2953    1050      0      
+                                                              
+    C:\ti\ccs1240\ccs\tools\compiler\ti-cgt-c2000_22.6.0.LTS\lib\rts2800_fpu32_eabi.lib
+       _printfi.c.obj                3286    66        0      
+       ll_div28.asm.obj              263     0         0      
+       ctype.c.obj                   0       257       0      
+       s_scalbn.c.obj                169     28        0      
+       fd_add28.asm.obj              156     0         0      
+       fd_div28.asm.obj              139     0         0      
+       fs_div28.asm.obj              136     0         0      
+       fd_mpy28.asm.obj              131     0         0      
+       s_frexp.c.obj                 90      8         0      
+       sprintf.c.obj                 50      0         0      
+       atoi.c.obj                    49      0         0      
+       _ltoa.c.obj                   48      0         0      
+       exit.c.obj                    41      0         6      
+       copy_decompress_lzss.c.obj    46      0         0      
+       autoinit.c.obj                43      0         0      
+       fd_cmp28.asm.obj              42      0         0      
+       l_div28.asm.obj               42      0         0      
+       s_copysign.c.obj              36      0         0      
+       fd_toi28.asm.obj              33      0         0      
+       fd_tol28.asm.obj              31      0         0      
+       ll_cmp28.asm.obj              30      0         0      
+       i_tofd28.asm.obj              29      0         0      
+       memcpy.c.obj                  29      0         0      
+       l_tofd28.asm.obj              28      0         0      
+       ll_aox28.asm.obj              24      0         0      
+       boot28.asm.obj                23      0         0      
+       memccpy.c.obj                 16      0         0      
+       fd_sub28.asm.obj              14      0         0      
+       _lock.c.obj                   9       0         4      
+       copy_zero_init.c.obj          13      0         0      
+       args_main.c.obj               12      0         0      
+       strchr.c.obj                  12      0         0      
+       wcslen.c.obj                  11      0         0      
+       fd_neg28.asm.obj              9       0         0      
+       copy_decompress_none.c.obj    8       0         0      
+       strlen.c.obj                  8       0         0      
+       memset.c.obj                  7       0         0      
+       strcpy.c.obj                  5       0         0      
+       pre_init.c.obj                2       0         0      
+       errno.c.obj                   0       0         1      
+       startup.c.obj                 1       0         0      
+    +--+-----------------------------+-------+---------+---------+
+       Total:                        5121    359       11     
+                                                              
+       Stack:                        0       0         256    
+       Linker Generated:             0       27        0      
+    +--+-----------------------------+-------+---------+---------+
+       Grand Total:                  10271   1751      329    
+
+
+LINKER GENERATED COPY TABLES
+
+__TI_cinit_table @ 000845e4 records: 2, size/record: 4, table size: 8
+	.data: load addr=000845d0, load size=00000009 bytes, run addr=0000a838, run size=00000012 bytes, compression=lzss
+	.bss: load addr=000845e0, load size=00000004 bytes, run addr=0000a800, run size=00000038 bytes, compression=zero_init
+
+
+LINKER GENERATED HANDLER TABLE
+
+__TI_handler_table @ 000845da records: 3, size/record: 2, table size: 6
+	index: 0, handler: __TI_zero_init
+	index: 1, handler: __TI_decompress_lzss
+	index: 2, handler: __TI_decompress_none
+
+
+GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
+
+address     data page           name
+--------    ----------------    ----
+00000400      10 (00000400)     __stack
+
+0000a800     2a0 (0000a800)     disp_buff
+0000a828     2a0 (0000a800)     rxDistance
+0000a832     2a0 (0000a800)     lidar_sample_timer
+0000a838     2a0 (0000a800)     Example_Result
+0000a83a     2a0 (0000a800)     Example_PassCount
+0000a83c     2a0 (0000a800)     Example_Fail
+0000a83e     2a0 (0000a800)     _lock
+
+0000a840     2a1 (0000a840)     __TI_enable_exit_profile_output
+0000a842     2a1 (0000a840)     __TI_cleanup_ptr
+0000a844     2a1 (0000a840)     __TI_dtors_ptr
+0000a846     2a1 (0000a840)     _unlock
+0000a849     2a1 (0000a840)     errno
+
+00090000    2400 (00090000)     _ctypes_
+
+000906ba    241a (00090680)     lidar_frame_rate_cmd
+
+000906c0    241b (000906c0)     lidar_cmd_distance
+
+
+GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
+
+page  address   name                                     
+----  -------   ----                                     
+0     00083d4e  C$$EXIT                                  
+0     000842d1  CPUTimer_setEmulationMode                
+0     00083bde  Device_configureTMXAnalogTrim            
+0     00082fe3  Device_enableAllPeripherals              
+0     00084219  Device_enableUnbondedGPIOPullups         
+0     00083f2b  Device_enableUnbondedGPIOPullupsFor100Pin
+0     000842e4  Device_enableUnbondedGPIOPullupsFor176Pin
+0     00083770  Device_init                              
+0     00083e2f  Device_initGPIO                          
+1     0000a83c  Example_Fail                             
+1     0000a83a  Example_PassCount                        
+1     0000a838  Example_Result                           
+0     00008000  Flash_initModule                         
+0     00083ad0  GPIO_setControllerCore                   
+0     00083c0f  GPIO_setDirectionMode                    
+0     000837c3  GPIO_setPadConfig                        
+0     00083b07  GPIO_setPinConfig                        
+0     00083b3e  GPIO_setQualificationMode                
+0     00083e50  I2C_getInterruptStatus                   
+0     000835fd  I2C_initController                       
+0     00083866  Interrupt_disable                        
+0     00083b75  Interrupt_enable                         
+0     00083a57  Interrupt_initModule                     
+0     00083eef  Interrupt_initVectorTable                
+0     00086128  RamfuncsLoadEnd                          
+abs   00000128  RamfuncsLoadSize                         
+0     00086000  RamfuncsLoadStart                        
+0     00008128  RamfuncsRunEnd                           
+abs   00000128  RamfuncsRunSize                          
+0     00008000  RamfuncsRunStart                         
+0     000839d4  SCI_clearInterruptStatus                 
+0     00083a19  SCI_setConfig                            
+0     00008124  SysCtl_delay                             
+0     00083815  SysCtl_getClock                          
+0     00083595  SysCtl_getDeviceParametric               
+0     0008409d  SysCtl_getLowSpeedClock                  
+0     000838b4  SysCtl_selectOscSource                   
+0     0008329e  SysCtl_selectXTAL                        
+0     00082cd6  SysCtl_setClock                          
+0     000845e4  __TI_CINIT_Base                          
+0     000845ec  __TI_CINIT_Limit                         
+0     000845ec  __TI_CINIT_Warm                          
+0     000845da  __TI_Handler_Table_Base                  
+0     000845e0  __TI_Handler_Table_Limit                 
+1     00000500  __TI_STACK_END                           
+abs   00000100  __TI_STACK_SIZE                          
+0     00083ccf  __TI_auto_init_nobinit_nopinit           
+1     0000a842  __TI_cleanup_ptr                         
+0     00083ca1  __TI_decompress_lzss                     
+0     00084596  __TI_decompress_none                     
+1     0000a844  __TI_dtors_ptr                           
+1     0000a840  __TI_enable_exit_profile_output          
+0     00083c71  __TI_ltoa                                
+abs   ffffffff  __TI_pprof_out_hndl                      
+0     00082b51  __TI_printfi                             
+abs   ffffffff  __TI_prof_data_size                      
+abs   ffffffff  __TI_prof_data_start                     
+0     00084530  __TI_zero_init_nomemset                  
+0     00083177  __c28xabi_addd                           
+0     00084177  __c28xabi_andll                          
+0     00083cfa  __c28xabi_cmpd                           
+0     00083f0d  __c28xabi_cmpll                          
+0     00083f1f  __c28xabi_cmpull                         
+0     00083213  __c28xabi_divd                           
+0     00083328  __c28xabi_divf                           
+0     00083d24  __c28xabi_divl                           
+0     00082edc  __c28xabi_divll                          
+0     00083d41  __c28xabi_divul                          
+0     00082f52  __c28xabi_divull                         
+0     00083e71  __c28xabi_dtoi                           
+0     00083ed0  __c28xabi_dtol                           
+0     00083f65  __c28xabi_itod                           
+0     00083f9f  __c28xabi_ltod                           
+0     00083d33  __c28xabi_modl                           
+0     00082f18  __c28xabi_modll                          
+0     00083d48  __c28xabi_modul                          
+0     00082f81  __c28xabi_modull                         
+0     000833b0  __c28xabi_mpyd                           
+0     0008457d  __c28xabi_negd                           
+0     0008417f  __c28xabi_orll                           
+0     000844ee  __c28xabi_subd                           
+0     00084187  __c28xabi_xorll                          
+n/a   UNDEFED   __c_args__                               
+0     000845ad  __error__                                
+1     00000400  __stack                                  
+0     0008453d  _args_main                               
+0     00084202  _c_int00                                 
+0     00090000  _ctypes_                                 
+1     0000a83e  _lock                                    
+0     0008457c  _nop                                     
+0     00084578  _register_lock                           
+0     00084574  _register_unlock                         
+0     000845cc  _system_post_cinit                       
+0     000845ca  _system_pre_init                         
+1     0000a846  _unlock                                  
+0     00083d4e  abort                                    
+0     00083c40  atoi                                     
+0     00080000  code_start                               
+0     00083dea  copysign                                 
+0     00083dea  copysignl                                
+1     0000a800  disp_buff                                
+1     0000a849  errno                                    
+0     00083d50  exit                                     
+0     000836be  frexp                                    
+0     000836be  frexpl                                   
+0     00083661  i2c_init                                 
+0     000838fc  i2c_master_rx                            
+0     00083a94  i2c_master_tx                            
+0     000830ce  ldexp                                    
+0     000830ce  ldexpl                                   
+0     000906c0  lidar_cmd_distance                       
+0     000906ba  lidar_frame_rate_cmd                     
+1     0000a832  lidar_sample_timer                       
+0     000834b2  lidar_sampler_ISR                        
+0     00083944  main                                     
+0     00084496  memccpy                                  
+0     00083f82  memcpy                                   
+0     000845b4  memset                                   
+1     0000a828  rxDistance                               
+0     000830ce  scalbn                                   
+0     000830ce  scalbnl                                  
+0     00083bac  sprintf                                  
+0     00084549  strchr                                   
+0     000845c1  strcpy                                   
+0     0008459e  strlen                                   
+0     00083528  timer_init                               
+0     0008398c  timer_set_freq                           
+0     00083718  uart_init                                
+0     000844b5  uart_tx_char                             
+0     00084445  uart_tx_str                              
+0     00084560  wcslen                                   
+
+
+GLOBAL SYMBOLS: SORTED BY Symbol Address 
+
+page  address   name                                     
+----  -------   ----                                     
+0     00008000  Flash_initModule                         
+0     00008000  RamfuncsRunStart                         
+0     00008124  SysCtl_delay                             
+0     00008128  RamfuncsRunEnd                           
+0     00080000  code_start                               
+0     00082b51  __TI_printfi                             
+0     00082cd6  SysCtl_setClock                          
+0     00082edc  __c28xabi_divll                          
+0     00082f18  __c28xabi_modll                          
+0     00082f52  __c28xabi_divull                         
+0     00082f81  __c28xabi_modull                         
+0     00082fe3  Device_enableAllPeripherals              
+0     000830ce  ldexp                                    
+0     000830ce  ldexpl                                   
+0     000830ce  scalbn                                   
+0     000830ce  scalbnl                                  
+0     00083177  __c28xabi_addd                           
+0     00083213  __c28xabi_divd                           
+0     0008329e  SysCtl_selectXTAL                        
+0     00083328  __c28xabi_divf                           
+0     000833b0  __c28xabi_mpyd                           
+0     000834b2  lidar_sampler_ISR                        
+0     00083528  timer_init                               
+0     00083595  SysCtl_getDeviceParametric               
+0     000835fd  I2C_initController                       
+0     00083661  i2c_init                                 
+0     000836be  frexp                                    
+0     000836be  frexpl                                   
+0     00083718  uart_init                                
+0     00083770  Device_init                              
+0     000837c3  GPIO_setPadConfig                        
+0     00083815  SysCtl_getClock                          
+0     00083866  Interrupt_disable                        
+0     000838b4  SysCtl_selectOscSource                   
+0     000838fc  i2c_master_rx                            
+0     00083944  main                                     
+0     0008398c  timer_set_freq                           
+0     000839d4  SCI_clearInterruptStatus                 
+0     00083a19  SCI_setConfig                            
+0     00083a57  Interrupt_initModule                     
+0     00083a94  i2c_master_tx                            
+0     00083ad0  GPIO_setControllerCore                   
+0     00083b07  GPIO_setPinConfig                        
+0     00083b3e  GPIO_setQualificationMode                
+0     00083b75  Interrupt_enable                         
+0     00083bac  sprintf                                  
+0     00083bde  Device_configureTMXAnalogTrim            
+0     00083c0f  GPIO_setDirectionMode                    
+0     00083c40  atoi                                     
+0     00083c71  __TI_ltoa                                
+0     00083ca1  __TI_decompress_lzss                     
+0     00083ccf  __TI_auto_init_nobinit_nopinit           
+0     00083cfa  __c28xabi_cmpd                           
+0     00083d24  __c28xabi_divl                           
+0     00083d33  __c28xabi_modl                           
+0     00083d41  __c28xabi_divul                          
+0     00083d48  __c28xabi_modul                          
+0     00083d4e  C$$EXIT                                  
+0     00083d4e  abort                                    
+0     00083d50  exit                                     
+0     00083dea  copysign                                 
+0     00083dea  copysignl                                
+0     00083e2f  Device_initGPIO                          
+0     00083e50  I2C_getInterruptStatus                   
+0     00083e71  __c28xabi_dtoi                           
+0     00083ed0  __c28xabi_dtol                           
+0     00083eef  Interrupt_initVectorTable                
+0     00083f0d  __c28xabi_cmpll                          
+0     00083f1f  __c28xabi_cmpull                         
+0     00083f2b  Device_enableUnbondedGPIOPullupsFor100Pin
+0     00083f65  __c28xabi_itod                           
+0     00083f82  memcpy                                   
+0     00083f9f  __c28xabi_ltod                           
+0     0008409d  SysCtl_getLowSpeedClock                  
+0     00084177  __c28xabi_andll                          
+0     0008417f  __c28xabi_orll                           
+0     00084187  __c28xabi_xorll                          
+0     00084202  _c_int00                                 
+0     00084219  Device_enableUnbondedGPIOPullups         
+0     000842d1  CPUTimer_setEmulationMode                
+0     000842e4  Device_enableUnbondedGPIOPullupsFor176Pin
+0     00084445  uart_tx_str                              
+0     00084496  memccpy                                  
+0     000844b5  uart_tx_char                             
+0     000844ee  __c28xabi_subd                           
+0     00084530  __TI_zero_init_nomemset                  
+0     0008453d  _args_main                               
+0     00084549  strchr                                   
+0     00084560  wcslen                                   
+0     00084574  _register_unlock                         
+0     00084578  _register_lock                           
+0     0008457c  _nop                                     
+0     0008457d  __c28xabi_negd                           
+0     00084596  __TI_decompress_none                     
+0     0008459e  strlen                                   
+0     000845ad  __error__                                
+0     000845b4  memset                                   
+0     000845c1  strcpy                                   
+0     000845ca  _system_pre_init                         
+0     000845cc  _system_post_cinit                       
+0     000845da  __TI_Handler_Table_Base                  
+0     000845e0  __TI_Handler_Table_Limit                 
+0     000845e4  __TI_CINIT_Base                          
+0     000845ec  __TI_CINIT_Limit                         
+0     000845ec  __TI_CINIT_Warm                          
+0     00086000  RamfuncsLoadStart                        
+0     00086128  RamfuncsLoadEnd                          
+0     00090000  _ctypes_                                 
+0     000906ba  lidar_frame_rate_cmd                     
+0     000906c0  lidar_cmd_distance                       
+1     00000400  __stack                                  
+1     00000500  __TI_STACK_END                           
+1     0000a800  disp_buff                                
+1     0000a828  rxDistance                               
+1     0000a832  lidar_sample_timer                       
+1     0000a838  Example_Result                           
+1     0000a83a  Example_PassCount                        
+1     0000a83c  Example_Fail                             
+1     0000a83e  _lock                                    
+1     0000a840  __TI_enable_exit_profile_output          
+1     0000a842  __TI_cleanup_ptr                         
+1     0000a844  __TI_dtors_ptr                           
+1     0000a846  _unlock                                  
+1     0000a849  errno                                    
+abs   00000100  __TI_STACK_SIZE                          
+abs   00000128  RamfuncsLoadSize                         
+abs   00000128  RamfuncsRunSize                          
+abs   ffffffff  __TI_pprof_out_hndl                      
+abs   ffffffff  __TI_prof_data_size                      
+abs   ffffffff  __TI_prof_data_start                     
+n/a   UNDEFED   __c_args__                               
+
+[131 symbols]
