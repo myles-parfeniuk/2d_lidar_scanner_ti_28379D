@@ -45,7 +45,7 @@ void main(void)
     Interrupt_initVectorTable(); //initialize PIE vector table with pointers to ISRs
     Interrupt_enableGlobal(); //enable global interrupts
 
-    uart_init(3*921600U); //initialize uart with ~3MBaud transfer rate
+    uart_init(3100000U); //initialize uart with ~3MBaud transfer rate
     i2c_init(); //initialize I2C
 
     //initialize lidar sampling timer
@@ -62,7 +62,9 @@ void main(void)
     GPIO_setDirectionMode(6, GPIO_DIR_MODE_OUT); //set as output
 
     //set frame rate of lidar sensor
-    i2c_master_tx(ADDR_LIDAR, lidar_frame_rate_cmd, LIDAR_CMD_FRAME_RATE_SZ);
+    i2c_master_tx(ADDR_LIDAR_1, lidar_frame_rate_cmd, LIDAR_CMD_FRAME_RATE_SZ);
+    DEVICE_DELAY_US(100000); //delay 100ms according to TF-MINI-S data sheet
+    i2c_master_tx(ADDR_LIDAR_2, lidar_frame_rate_cmd, LIDAR_CMD_FRAME_RATE_SZ);
     DEVICE_DELAY_US(100000); //delay 100ms according to TF-MINI-S data sheet
 
     while(1)
@@ -81,30 +83,50 @@ void main(void)
 __interrupt void lidar_sampler_ISR(void)
 {
     //when true send request to lidar sensor for distance data (master tx), when false receive distance sample (master rx)
-    static bool tx_time = true;
+    static uint8_t state = STATE_0_REQ_DIST_LIDAR_1;
 
-    if(tx_time)
+
+    CPUTimer_disableInterrupt(lidar_sample_timer.module); //enable interrupt for respective timer module
+
+    switch(state)
     {
-        //set 1ms period for timer
-        lidar_sample_timer.freq = 1000;
-        timer_set_freq(&lidar_sample_timer);
+        case STATE_0_REQ_DIST_LIDAR_1:
+            i2c_master_tx(ADDR_LIDAR_1, lidar_cmd_distance, LIDAR_CMD_DIST_SZ); //(1/400KHz * (8*(LIDAR_CMD_DIST_SZ + address_byte|W)) == 120us
+            lidar_sample_timer.freq = 20000; ///50us wait before state 1
+            state++;
 
-        //request distance data (master tx)
-        i2c_master_tx(ADDR_LIDAR, lidar_cmd_distance, LIDAR_CMD_DIST_SZ);
+            break;
+
+        case STATE_1_REQ_DIST_LIDAR_2:
+
+            i2c_master_tx(ADDR_LIDAR_2, lidar_cmd_distance, LIDAR_CMD_DIST_SZ); //120us
+            lidar_sample_timer.freq = 1980; //505us wait before state 2 (1000us-2*120us-50us= 710us)
+            state++;
+
+            break;
+
+        case STATE_2_RD_DIST_LIDAR_1:
+
+            i2c_master_rx(ADDR_LIDAR_1, rx_distance_1, LIDAR_DAT_DIST_SZ); //(1/400KHz * (8*(LIDAR_DAT_DIST_SZ + address_byte|R)) == 205us/
+            lidar_sample_timer.freq = 25000; //40us wait before state 3
+            state++;
+
+            break;
+
+        case STATE_3_RD_DIST_LIDAR_2:
+
+            i2c_master_rx(ADDR_LIDAR_2, rx_distance_2, LIDAR_DAT_DIST_SZ);
+            sprintf(disp_buff, "111 %03d %03d\n\r", (unsigned int)(rx_distance_1[2]|(rx_distance_1[3] << 8)), (unsigned int)(rx_distance_2[2]|(rx_distance_2[3] << 8))); //save acquired data to buffer
+            uart_tx_str(disp_buff); //send out data to python client
+            lidar_sample_timer.freq = 100000; //10us wait before state 3
+            state = STATE_0_REQ_DIST_LIDAR_1;
+
+            break;
+
     }
-    else
-    {
-        //set 0.2ms period for timer
-        lidar_sample_timer.freq = 5000;
-        timer_set_freq(&lidar_sample_timer);
 
-        //read distance (master rx)
-        i2c_master_rx(ADDR_LIDAR, rxDistance, LIDAR_DAT_DIST_SZ);
-        sprintf(disp_buff, "111 %03d\n\r", (unsigned int)(rxDistance[2]|(rxDistance[3] << 8))); //save acquired data to buffer
-        uart_tx_str(disp_buff); //send out data to python client
-    }
-
-    tx_time = !tx_time; //if just requested data, toggle to receive state, or vice versa
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1); //clear CPUTIMER0 respective interrupt flags
+    timer_set_freq(&lidar_sample_timer);
+    CPUTimer_enableInterrupt(lidar_sample_timer.module); //enable interrupt for respective timer module
 
 }
