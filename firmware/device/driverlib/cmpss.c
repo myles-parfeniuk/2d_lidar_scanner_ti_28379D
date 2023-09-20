@@ -5,8 +5,10 @@
 // TITLE:  C28x CMPSS driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -55,6 +57,8 @@ CMPSS_configFilterHigh(uint32_t base, uint16_t samplePrescale,
     // Check the arguments.
     //
     ASSERT(CMPSS_isBaseValid(base));
+    ASSERT(samplePrescale < 1024U);
+    ASSERT((sampleWindow >= 1U) && (sampleWindow <= 32U));
     ASSERT((threshold - 1U) >= ((sampleWindow - 1U) / 2U));
 
     //
@@ -94,6 +98,8 @@ CMPSS_configFilterLow(uint32_t base, uint16_t samplePrescale,
     // Check the arguments.
     //
     ASSERT(CMPSS_isBaseValid(base));
+    ASSERT(samplePrescale < 1024U);
+    ASSERT((sampleWindow >= 1U) && (sampleWindow <= 32U));
     ASSERT((threshold - 1U) >= ((sampleWindow - 1U) / 2U));
 
     //
@@ -176,7 +182,7 @@ CMPSS_configRamp(uint32_t base, uint16_t maxRampVal, uint16_t decrementVal,
     //
     ASSERT(CMPSS_isBaseValid(base));
     ASSERT(delayVal <= CMPSS_RAMPDLYS_DELAY_M);
-    ASSERT((pwmSyncSrc >= 1U) && (pwmSyncSrc <= 12U));
+    ASSERT((pwmSyncSrc >= 1U) && (pwmSyncSrc <= 16U));
 
     EALLOW;
 
@@ -218,4 +224,3 @@ CMPSS_configRamp(uint32_t base, uint16_t maxRampVal, uint16_t decrementVal,
     //
     HWREGH(base + CMPSS_O_RAMPDLYS) = delayVal;
 }
-

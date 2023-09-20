@@ -5,8 +5,10 @@
 // TITLE:   C28x HRPWM Driver
 //
 //#############################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -128,7 +130,7 @@ typedef enum
     //! load when counter equals period
     HRPWM_LOAD_ON_CNTR_PERIOD = 1,
     //! load when counter equals zero or period
-    HRPWM_LOAD_ON_CNTR_ZERO_PERIOD = 2,
+    HRPWM_LOAD_ON_CNTR_ZERO_PERIOD = 2
 } HRPWM_LoadMode;
 
 //*****************************************************************************
@@ -223,7 +225,7 @@ typedef enum
 #define HRPWM_setTimeBaseCounter                 EPWM_setTimeBaseCounter
 #define HRPWM_setCountModeAfterSync              EPWM_setCountModeAfterSync
 #define HRPWM_setClockPrescaler                  EPWM_setClockPrescaler
-#define HRPWM_swForceSyncPulse                   EPWM_forceSyncPulse
+#define HRPWM_swForceSyncPulse                   EPWM_swForceSyncPulse
 #define HRPWM_setSyncOutPulseMode                EPWM_setSyncOutPulseMode
 #define HRPWM_setPeriodLoadMode                  EPWM_setPeriodLoadMode
 #define HRPWM_setTimeBaseCounterMode             EPWM_setTimeBaseCounterMode
@@ -262,14 +264,9 @@ typedef enum
                                   EPWM_setActionQualifierContSWForceShadowMode
 #define HRPWM_setActionQualifierContSWForceAction                             \
                                   EPWM_setActionQualifierContSWForceAction
-/* HRPWM_setActionQualifierSwAction is kept for compatibility,
-use HRPWM_setActionQualifierSWAction*/
 #define HRPWM_setActionQualifierSwAction        EPWM_setActionQualifierSwAction
-#define HRPWM_setActionQualifierSWAction        EPWM_setActionQualifierSWAction
-/* HRPWM_forceActionQualifierSwAction  is kept for compatibility,
-use HRPWM_forceActionQualifierSWAction*/
 #define HRPWM_forceActionQualifierSwAction    EPWM_forceActionQualifierSwAction
-#define HRPWM_forceActionQualifierSWAction    EPWM_forceActionQualifierSWAction
+
 //
 // Dead Band Module related APIs
 //
@@ -327,7 +324,7 @@ use HRPWM_forceActionQualifierSWAction*/
 // HRPWM_getTripZoneInterruptStatus API define is obsolete please use
 // HRPWM_getTripZoneFlagStatus going forward.
 //
-#define HRPWM_getTripZoneInterruptStatus        EPWM_getTripZoneFlagStatus
+#define HRPWM_getTripZoneInterruptStatus        HRPWM_getTripZoneFlagStatus
 #define HRPWM_getTripZoneFlagStatus             EPWM_getTripZoneFlagStatus
 
 //
@@ -925,11 +922,6 @@ HRPWM_setChannelBOutputPath(uint32_t base, HRPWM_ChannelBOutput outputOnB)
 //! This function enables the MEP (Micro Edge Positioner) to automatically
 //! scale HRMSTEP.
 //!
-//! The SFO library will calculate required MEP steps per coarse steps and
-//! feed it to HRMSTEP register. The MEP calibration module will use the value
-//! in HRMSTEP to determine appropriate number of MEP steps represented by
-//! fractional duty cycle.
-//!
 //! \return None.
 //
 //*****************************************************************************
@@ -1112,6 +1104,11 @@ HRPWM_disablePhaseShiftLoad(uint32_t base)
 static inline void
 HRPWM_setSyncPulseSource(uint32_t base, HRPWM_SyncPulseSource syncPulseSource)
 {
+    //
+    // Check the arguments
+    //
+    ASSERT(HRPWM_isBaseValid(base));
+
     //
     // Set the PWMSYNC source
     //
@@ -1386,7 +1383,7 @@ HRPWM_setRisingEdgeDelay(uint32_t base, uint32_t redCount)
     // Check the arguments
     //
     ASSERT(HRPWM_isBaseValid(base));
-    ASSERT(redCount < 0x200000U);
+    ASSERT(redCount < 0x200000);
 
     //
     // Set the consolidated RED (Rising Edge Delay) count
@@ -1450,7 +1447,7 @@ HRPWM_setFallingEdgeDelay(uint32_t base, uint32_t fedCount)
     // Check the arguments
     //
     ASSERT(HRPWM_isBaseValid(base));
-    ASSERT(fedCount < 0x200000U);
+    ASSERT(fedCount < 0x200000);
 
     //
     // Set the High Resolution FED (Falling Edge Delay) count
@@ -1633,7 +1630,6 @@ HRPWM_setFallingEdgeDelayLoadMode(uint32_t base, HRPWM_LoadMode loadEvent)
         ((uint16_t)loadEvent << HRPWM_HRCNFG2_CTLMODEDBFED_S));
     EDIS;
 }
-
 
 //*****************************************************************************
 //

@@ -5,8 +5,10 @@
 // TITLE:  C28x EMIF driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -59,8 +61,6 @@ extern "C"
 //
 //*****************************************************************************
 
-#include <stdbool.h>
-#include <stdint.h>
 #include "inc/hw_emif.h"
 #include "inc/hw_memcfg.h"
 #include "inc/hw_memmap.h"
@@ -110,6 +110,7 @@ extern "C"
 #define EMIF_ACCPROT0_MASK_EMIF2                                              \
                              ((uint16_t)MEMCFG_EMIF2ACCPROT0_FETCHPROT_EMIF2 |\
                               (uint16_t)MEMCFG_EMIF2ACCPROT0_CPUWRPROT_EMIF2)
+
 
 //*****************************************************************************
 //
@@ -246,17 +247,17 @@ typedef enum
 } EMIF_AsyncWaitPolarity;
 //*****************************************************************************
 //
-//! Values that can be passed to EMIF_selectController() as the
+//! Values that can be passed to EMIF_selectMaster() as the
 //! \e select parameter.
 //
 //*****************************************************************************
 typedef enum
 {
-    EMIF_CONTROLLER_CPU1_NG  = 0x00000000U, //!<CPU1 is controller but not grabbed
-    EMIF_CONTROLLER_CPU1_G   = 0x00000001U, //!<CPU1 is controller & grabbed
-    EMIF_CONTROLLER_CPU2_G   = 0x00000002U, //!<CPU2 is controller & grabbed
-    EMIF_CONTROLLER_CPU1_NG2 = 0x00000003U  //!<CPU1 is controller but not grabbed
-} EMIF_ControllerSelect;
+    EMIF_MASTER_CPU1_NG  = 0x00000000U, //!<CPU1 is master but not grabbed
+    EMIF_MASTER_CPU1_G   = 0x00000001U, //!<CPU1 is master & grabbed
+    EMIF_MASTER_CPU2_G   = 0x00000002U, //!<CPU2 is master & grabbed
+    EMIF_MASTER_CPU1_NG2 = 0x00000003U  //!<CPU1 is master but not grabbed
+} EMIF_MasterSelect;
 
 //*****************************************************************************
 //
@@ -429,24 +430,23 @@ EMIF_isEMIF2ConfigBaseValid(uint32_t configBase)
 #endif
 //*****************************************************************************
 //
-//! Selects the EMIF Controller.
+//! Selects the EMIF Master.
 //!
 //! \param configBase is the configuration address of the EMIF instance used.
 //!
-//! \param select is the required controller configuration for EMIF1.
+//! \param select is the required master configuration for EMIF1.
 //!
-//! This function selects the controller for an EMIF1 instance among CPU1 or
-//! CPU2.<em> It is valid only for EMIF1 instance and not for EMIF2 instance.
-//! Valid value for configBase parameter is EMIF1CONFIG_BASE. </em> Valid
-//! values for select parameter can be \e EMIF_CONTROLLER_CPU1_NG,
-//! \e EMIF_CONTROLLER_CPU1_G, \e EMIF_CONTROLLER_CPU2_G or
-//! \e EMIF_CONTROLLER_CPU1_NG2.
+//! This function selects the master for an EMIF1 instance among CPU1 or CPU2.
+//! <em> It is valid only for EMIF1 instance and not for EMIF2 instance. Valid
+//! value for configBase parameter is EMIF1CONFIG_BASE. </em> Valid values for
+//! select parameter can be \e EMIF_MASTER_CPU1_NG, \e EMIF_MASTER_CPU1_G,
+//! \e EMIF_MASTER_CPU2_G or \e EMIF_MASTER_CPU1_NG2.
 //!
 //! \return None.
 //
 //*****************************************************************************
 static inline void
-EMIF_selectController(uint32_t configBase, EMIF_ControllerSelect select)
+EMIF_selectMaster(uint32_t configBase, EMIF_MasterSelect select)
 {
     //
     // Check the arguments.
@@ -454,7 +454,7 @@ EMIF_selectController(uint32_t configBase, EMIF_ControllerSelect select)
     ASSERT(EMIF_isEMIF1ConfigBaseValid(configBase));
 
     //
-    // Sets the bits that enables EMIF1 controller selection.
+    // Sets the bits that enables EMIF1 master selection.
     //
     EALLOW;
     HWREG(configBase + MEMCFG_O_EMIF1MSEL) = (EMIF_MSEL_KEY | (uint32_t)select);
@@ -1302,7 +1302,7 @@ EMIF_disableSyncRefreshInPowerDown(uint32_t base)
 //! \param base is the base address of the EMIF instance used.
 //!
 //! This function returns total number of SDRAM accesses
-//! from a controller(CPUx/CPUx.DMA).
+//! from a master(CPUx/CPUx.DMA).
 //!
 //! \return \e Returns total number of accesses to SDRAM.
 //

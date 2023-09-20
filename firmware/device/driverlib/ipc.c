@@ -2,11 +2,12 @@
 //
 // FILE:   ipc.c
 //
-// TITLE:  C28x IPC driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -56,61 +57,10 @@
 // Global Circular Buffer Definitions
 //
 
-
-#pragma DATA_SECTION(IPC_CPU1_To_CPU2_PutBuffer, "MSGRAM_CPU1_TO_CPU2")
-#pragma DATA_SECTION(IPC_CPU1_To_CPU2_GetBuffer, "MSGRAM_CPU2_TO_CPU1")
-
-//
-// IPC_CPU1_To_CPU2_PutBuffer acts as IPC_CPU2_To_CPU1_GetBuffer and
-// IPC_CPU1_To_CPU2_GetBuffer acts as IPC_CPU2_To_CPU1_PutBuffer
-//
-IPC_PutBuffer_t IPC_CPU1_To_CPU2_PutBuffer;
-IPC_GetBuffer_t IPC_CPU1_To_CPU2_GetBuffer;
 #endif
 
 const IPC_Instance_t IPC_Instance[IPC_TOTAL_NUM] = {
 
-     /* IPC_CPU1_L_CPU2_R */
-     {
-      .IPC_Flag_Ctr_Reg   = (volatile IPC_Flag_Ctr_Reg_t *) IPC_BASE,
-      .IPC_SendCmd_Reg    = (volatile IPC_SendCmd_Reg_t *)
-                            (IPC_BASE + 0x10U),
-      .IPC_RecvCmd_Reg    = (volatile IPC_RecvCmd_Reg_t *)
-                            (IPC_BASE + 0x18U),
-      .IPC_Boot_Pump_Reg  = (volatile IPC_Boot_Pump_Reg_t *)
-                            (IPC_BASE + 0x20U),
-      .IPC_IntNum         = {INT_IPC_0, INT_IPC_1, INT_IPC_2, INT_IPC_3,
-                             0U, 0U, 0U, 0U},
-      .IPC_MsgRam_LtoR    = CPU1_TO_CPU2_MSG_RAM_BASE,
-      .IPC_MsgRam_RtoL    = CPU2_TO_CPU1_MSG_RAM_BASE,
-      .IPC_Offset_Corr    = IPC_ADDR_OFFSET_NOCHANGE
-#if IPC_MSGQ_SUPPORT == 1U
-      ,
-      .IPC_PutBuffer      = &IPC_CPU1_To_CPU2_PutBuffer,
-      .IPC_GetBuffer      = &IPC_CPU1_To_CPU2_GetBuffer
-#endif
-     },
-
-     /* IPC_CPU2_L_CPU1_R */
-     {
-      .IPC_Flag_Ctr_Reg   = (volatile IPC_Flag_Ctr_Reg_t *) IPC_BASE,
-      .IPC_SendCmd_Reg    = (volatile IPC_SendCmd_Reg_t *)
-                            (IPC_BASE + 0x18U),
-      .IPC_RecvCmd_Reg    = (volatile IPC_RecvCmd_Reg_t *)
-                            (IPC_BASE + 0x10U),
-      .IPC_Boot_Pump_Reg  = (volatile IPC_Boot_Pump_Reg_t *)
-                            (IPC_BASE + 0x20U),
-      .IPC_IntNum         = {INT_IPC_0, INT_IPC_1, INT_IPC_2, INT_IPC_3,
-                             0U, 0U, 0U, 0U},
-      .IPC_MsgRam_LtoR    = CPU2_TO_CPU1_MSG_RAM_BASE,
-      .IPC_MsgRam_RtoL    = CPU1_TO_CPU2_MSG_RAM_BASE,
-      .IPC_Offset_Corr    = IPC_ADDR_OFFSET_NOCHANGE
-#if IPC_MSGQ_SUPPORT == 1U
-      ,
-      .IPC_PutBuffer      = (IPC_PutBuffer_t *)&IPC_CPU1_To_CPU2_GetBuffer,
-      .IPC_GetBuffer      = (IPC_GetBuffer_t *)&IPC_CPU1_To_CPU2_PutBuffer
-#endif
-     }
 };
 
 //*****************************************************************************
@@ -226,7 +176,6 @@ void IPC_registerInterrupt(IPC_Type_t ipcType, uint32_t ipcInt,
     // Check for arguments
     //
 
-    ASSERT(ipcInt <= IPC_INT3);
 
     //
     // Get the corresponding interrupt number
@@ -237,7 +186,6 @@ void IPC_registerInterrupt(IPC_Type_t ipcType, uint32_t ipcInt,
     // Register the interrupt handler
     //
 
-    Interrupt_register(intNum, pfnHandler);
 
     //
     // Enable the interrupt
@@ -256,7 +204,6 @@ void IPC_unregisterInterrupt(IPC_Type_t ipcType, uint32_t ipcInt)
     // Check for arguments
     //
 
-    ASSERT(ipcInt <= IPC_INT3);
 
     //
     // Get the corresponding interrupt number
@@ -272,7 +219,6 @@ void IPC_unregisterInterrupt(IPC_Type_t ipcType, uint32_t ipcInt)
     // Unregister the interrupt handler.
     //
 
-    Interrupt_unregister(intNum);
 }
 
 #if IPC_MSGQ_SUPPORT == 1U

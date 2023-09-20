@@ -5,8 +5,10 @@
 // TITLE:  C28x GPIO driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -146,7 +148,7 @@ typedef enum
 //*****************************************************************************
 typedef enum
 {
-    GPIO_QUAL_SYNC,                     //!< Synchronization to SYSCLK
+    GPIO_QUAL_SYNC,                     //!< Synchronization to SYSCLKOUT
     GPIO_QUAL_3SAMPLE,                  //!< Qualified with 3 samples
     GPIO_QUAL_6SAMPLE,                  //!< Qualified with 6 samples
     GPIO_QUAL_ASYNC                     //!< No synchronization
@@ -165,16 +167,15 @@ typedef enum
 
 //*****************************************************************************
 //
-//! Values that can be passed to GPIO_setControllerCore() as the \e core
-//! parameter.
+//! Values that can be passed to GPIO_setMasterCore() as the \e core parameter.
 //
 //*****************************************************************************
 typedef enum
 {
-    GPIO_CORE_CPU1,             //!< CPU1 selected as controller core
-    GPIO_CORE_CPU1_CLA1,        //!< CPU1's CLA1 selected as controller core
-    GPIO_CORE_CPU2,             //!< CPU2 selected as controller core
-    GPIO_CORE_CPU2_CLA1         //!< CPU2's CLA1 selected as controller core
+    GPIO_CORE_CPU1,             //!< CPU1 selected as master core
+    GPIO_CORE_CPU1_CLA1,        //!< CPU1's CLA1 selected as master core
+    GPIO_CORE_CPU2,             //!< CPU2 selected as master core
+    GPIO_CORE_CPU2_CLA1         //!< CPU2's CLA1 selected as master core
 } GPIO_CoreSelect;
 
 //*****************************************************************************
@@ -956,15 +957,15 @@ GPIO_setQualificationPeriod(uint32_t pin, uint32_t divider);
 
 //*****************************************************************************
 //
-//! Selects the controller core of a specified pin.
+//! Selects the master core of a specified pin.
 //!
 //! \param pin is the identifying GPIO number of the pin.
-//! \param core is the core that is controller of the specified pin.
+//! \param core is the core that is master of the specified pin.
 //!
 //! This function configures which core owns the specified pin's data registers
 //! (DATA, SET, CLEAR, and TOGGLE). The \e core parameter is an enumerated data
 //! type that specifies the core, such as \b GPIO_CORE_CPU1_CLA1 to make CPU1's
-//! CLA1 controller of the pin.
+//! CLA1 master of the pin.
 //!
 //! The pin is specified by its numerical value. For example, GPIO34 is
 //! specified by passing 34 as \e pin.
@@ -973,7 +974,7 @@ GPIO_setQualificationPeriod(uint32_t pin, uint32_t divider);
 //
 //*****************************************************************************
 extern void
-GPIO_setControllerCore(uint32_t pin, GPIO_CoreSelect core);
+GPIO_setMasterCore(uint32_t pin, GPIO_CoreSelect core);
 
 //*****************************************************************************
 //
@@ -995,9 +996,6 @@ GPIO_setControllerCore(uint32_t pin, GPIO_CoreSelect core);
 //!
 //! The pin is specified by its numerical value. For example, GPIO34 is
 //! specified by passing 34 as \e pin.
-//!
-//! \b Note: The pin parameter is applicable for both AIO and GPIO because
-//! the GPAxMSEL.GPIOy register configures for both
 //!
 //! \return None.
 //

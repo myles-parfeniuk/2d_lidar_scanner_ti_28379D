@@ -5,8 +5,10 @@
 // TITLE:  C28x X-BAR driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -151,14 +153,13 @@ typedef enum
     XBAR_OUTPUT5 = 8,       //!< OUTPUT5 of the Output X-BAR
     XBAR_OUTPUT6 = 10,      //!< OUTPUT6 of the Output X-BAR
     XBAR_OUTPUT7 = 12,      //!< OUTPUT7 of the Output X-BAR
-    XBAR_OUTPUT8 = 14,      //!< OUTPUT8 of the Output X-BAR
+    XBAR_OUTPUT8 = 14       //!< OUTPUT8 of the Output X-BAR
 } XBAR_OutputNum;
 
 //*****************************************************************************
 //
 //! The following values define the \e trip parameter for
-//! XBAR_setEPWMMuxConfig(), XBAR_invertEPWMSignal(), XBAR_enableEPWMMux(),
-//! and XBAR_disableEPWMMux().
+//! XBAR_setEPWMMuxConfig(), XBAR_enableEPWMMux(), and XBAR_disableEPWMMux().
 //
 //*****************************************************************************
 typedef enum
@@ -312,7 +313,7 @@ typedef enum
     XBAR_OUT_MUX29_SD2FLT3_COMPL           = 0x3A00,
     XBAR_OUT_MUX30_SD2FLT4_COMPH           = 0x3C00,
     XBAR_OUT_MUX30_SD2FLT4_COMPH_OR_COMPL  = 0x3C01,
-    XBAR_OUT_MUX31_SD2FLT4_COMPL           = 0x3E00,
+    XBAR_OUT_MUX31_SD2FLT4_COMPL           = 0x3E00
 
 } XBAR_OutputMuxConfig;
 
@@ -507,9 +508,8 @@ typedef enum
     XBAR_CLB_MUX29_SD2FLT3_COMPL           = 0x3A00,
     XBAR_CLB_MUX30_SD2FLT4_COMPH           = 0x3C00,
     XBAR_CLB_MUX30_SD2FLT4_COMPH_OR_COMPL  = 0x3C01,
-    XBAR_CLB_MUX31_SD2FLT4_COMPL           = 0x3E00,
+    XBAR_CLB_MUX31_SD2FLT4_COMPL           = 0x3E00
 } XBAR_CLBMuxConfig;
-
 
 //*****************************************************************************
 //
@@ -654,8 +654,6 @@ XBAR_enableOutputMux(XBAR_OutputNum output, uint32_t muxes)
     HWREG(XBAR_OUTPUT_EN_REG_BASE + (uint16_t)output) |= muxes;
 
     EDIS;
-
-
 }
 
 //*****************************************************************************
@@ -696,7 +694,6 @@ XBAR_disableOutputMux(XBAR_OutputNum output, uint32_t muxes)
 //! Enables or disables the output latch to drive the selected output.
 //!
 //! \param output is the X-BAR output being configured.
-//! The valid inputs are XBAR_OUTPUTy where y is from 1 to 8.
 //! \param enable is a flag that determines whether or not the latch is
 //! selected to drive the X-BAR output.
 //!
@@ -734,7 +731,6 @@ XBAR_setOutputLatchMode(XBAR_OutputNum output, bool enable)
 //! Returns the status of the output latch
 //!
 //! \param output is the X-BAR output being checked.
-//! The valid inputs are XBAR_OUTPUTy where y is from 1 to 8.
 //!
 //! \return Returns \b true if the output corresponding to \e output was
 //! triggered. If not, it will return \b false.
@@ -755,7 +751,6 @@ XBAR_getOutputLatchStatus(XBAR_OutputNum output)
 //! Clears the output latch for the specified output.
 //!
 //! \param output is the X-BAR output being configured.
-//! The valid inputs are XBAR_OUTPUTy where y is from 1 to 8.
 //!
 //! This function clears the Output X-BAR output latch. The output to be
 //! configured is specified by the \e output parameter.
@@ -778,7 +773,6 @@ XBAR_clearOutputLatch(XBAR_OutputNum output)
 //! Forces the output latch for the specified output.
 //!
 //! \param output is the X-BAR output being configured.
-//! The valid inputs are XBAR_OUTPUTy where y is from 1 to 8.
 //!
 //! This function forces the Output X-BAR output latch. The output to be
 //! configured is specified by the \e output parameter.
@@ -793,7 +787,7 @@ XBAR_forceOutputLatch(XBAR_OutputNum output)
     // Set the bit that forces the corresponding OUTPUTLATCH bit.
     //
     HWREGH(OUTPUTXBAR_BASE + XBAR_O_OUTPUTLATCHFRC) =
-        (uint16_t)0x1U << ((uint16_t)output / 2U);
+        0x1U << ((uint16_t)output / 2U);
 }
 
 //*****************************************************************************
@@ -801,7 +795,6 @@ XBAR_forceOutputLatch(XBAR_OutputNum output)
 //! Configures the polarity of an Output X-BAR output.
 //!
 //! \param output is the X-BAR output being configured.
-//! The valid inputs are XBAR_OUTPUTy where y is from 1 to 8.
 //! \param invert is a flag that determines whether the output is active-high
 //! or active-low.
 //!
@@ -862,7 +855,8 @@ XBAR_enableEPWMMux(XBAR_TripNum trip, uint32_t muxes)
     //
     EALLOW;
 
-    HWREG(XBAR_EPWM_EN_REG_BASE + (uint32_t)trip) |= muxes;
+    HWREG(XBAR_EPWM_EN_REG_BASE + (uint16_t)trip) |= muxes;
+
     EDIS;
 }
 
@@ -893,7 +887,7 @@ XBAR_disableEPWMMux(XBAR_TripNum trip, uint32_t muxes)
     //
     EALLOW;
 
-    HWREG(XBAR_EPWM_EN_REG_BASE + (uint32_t)trip) &= ~(muxes);
+    HWREG(XBAR_EPWM_EN_REG_BASE + (uint16_t)trip) &= ~(muxes);
 
     EDIS;
 }
@@ -990,7 +984,7 @@ XBAR_lockInput(XBAR_InputNum input)
     //
     EALLOW;
     HWREG(INPUTXBAR_BASE + XBAR_O_INPUTSELECTLOCK) =
-            1UL << (uint16_t)input;
+        (uint32_t)1U << (uint16_t)input;
     EDIS;
 }
 
@@ -1040,6 +1034,7 @@ XBAR_lockEPWM(void)
     HWREG(EPWMXBAR_BASE + XBAR_O_TRIPLOCK) =
         ((uint32_t)0x5A5A << XBAR_TRIPLOCK_KEY_S) |
         (uint32_t)XBAR_TRIPLOCK_LOCK;
+
     EDIS;
 }
 
@@ -1070,7 +1065,7 @@ XBAR_enableCLBMux(XBAR_AuxSigNum auxSignal, uint32_t muxes)
     //
     EALLOW;
 
-    HWREG(XBAR_CLB_EN_REG_BASE + (uint32_t)auxSignal) |= muxes;
+    HWREG(XBAR_CLB_EN_REG_BASE + (uint16_t)auxSignal) |= muxes;
 
     EDIS;
 }
@@ -1102,7 +1097,7 @@ XBAR_disableCLBMux(XBAR_AuxSigNum auxSignal, uint32_t muxes)
     //
     EALLOW;
 
-    HWREG(XBAR_CLB_EN_REG_BASE + (uint32_t)auxSignal) &= ~(muxes);
+    HWREG(XBAR_CLB_EN_REG_BASE + (uint16_t)auxSignal) &= ~(muxes);
 
     EDIS;
 }
@@ -1200,7 +1195,7 @@ XBAR_setOutputMuxConfig(XBAR_OutputNum output, XBAR_OutputMuxConfig muxConfig);
 //! be logically OR'd before being passed to the trip signal. This means that
 //! this function may be called, for example, with the argument
 //! \b XBAR_EPWM_MUX00_ECAP1_OUT and then with the argument
-//! \b XBAR_EPWM_MUX01_INPUTXBAR1, resulting in the values of MUX00 and MUX01
+//! \b XBAR_EPWM_MUX01_INPUTXBAR1, resulting in the values of MUX00 and MUX03
 //! being logically OR'd if both are enabled. Calling the function twice for
 //! the same mux on the output will result in the configuration in the second
 //! call overwriting the first.

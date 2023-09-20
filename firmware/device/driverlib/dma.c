@@ -5,8 +5,10 @@
 // TITLE:  C28x DMA driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -82,7 +84,7 @@ void DMA_configBurst(uint32_t base, uint16_t size, int16_t srcStep,
     // Check the arguments.
     //
     ASSERT(DMA_isBaseValid(base));
-    ASSERT((size >= 1U) && (size <= 32U));
+    ASSERT((size >= 1U) || (size <= 32U));
 
     EALLOW;
 
@@ -108,7 +110,7 @@ void DMA_configTransfer(uint32_t base, uint32_t transferSize, int16_t srcStep,
     // Check the arguments.
     //
     ASSERT(DMA_isBaseValid(base));
-    ASSERT(transferSize <= 0x10000U);
+    ASSERT(transferSize <= 0x10000);
 
     EALLOW;
 
@@ -134,7 +136,7 @@ void DMA_configWrap(uint32_t base, uint32_t srcWrapSize, int16_t srcStep,
     // Check the arguments.
     //
     ASSERT(DMA_isBaseValid(base));
-    ASSERT((srcWrapSize <= 0x10000U) || (destWrapSize <= 0x10000U));
+    ASSERT((srcWrapSize <= 0x10000) || (destWrapSize <= 0x10000));
 
     EALLOW;
 
@@ -281,76 +283,5 @@ void DMA_configMode(uint32_t base, DMA_Trigger trigger, uint32_t config)
     HWREGH(base + DMA_O_MODE) |= config;
 
     EDIS;
-}
-
-//*****************************************************************************
-//
-// DMA_configChannel
-//
-//*****************************************************************************
-void DMA_configChannel(uint32_t base, const DMA_ConfigParams *transfParams)
-{
-    //
-    // Check the arguments.
-    //
-    ASSERT(DMA_isBaseValid(base));
-
-    //
-    // Configure DMA Channel
-    //
-    DMA_configAddresses(base, (const void *)transfParams->destAddr,
-                        (const void *)transfParams->srcAddr);
-
-    //
-    // Configure the size of each burst and the address step size
-    //
-    DMA_configBurst(base, transfParams->burstSize, transfParams->srcBurstStep,
-                    transfParams->destBurstStep);
-
-    //
-    // Configure the transfer size and the address step that is
-    // made after each burst.
-    //
-    DMA_configTransfer(base, transfParams->transferSize,
-                       transfParams->srcTransferStep,
-                       transfParams->destTransferStep);
-
-    //
-    // Configure the DMA channel's wrap settings
-    //
-    DMA_configWrap(base, transfParams->srcWrapSize, transfParams->srcWrapStep,
-                   transfParams->destWrapSize, transfParams->destWrapStep);
-
-    //
-    // Configure the DMA channel's trigger and mode
-    //
-    DMA_configMode(base, transfParams->transferTrigger,
-                   transfParams->transferMode | transfParams->reinitMode |
-                   transfParams->configSize);
-
-    //
-    // Enable the selected peripheral trigger to start a DMA transfer
-    //
-    DMA_enableTrigger(base);
-
-    if(transfParams->enableInterrupt)
-    {
-        //
-        // Set the channel interrupt mode
-        //
-        DMA_setInterruptMode(base, transfParams->interruptMode);
-
-        //
-        // Enable the indicated DMA channel interrupt source
-        //
-        DMA_enableInterrupt(base);
-    }
-    else
-    {
-        //
-        // Disable the indicated DMA channel interrupt source
-        //
-        DMA_disableInterrupt(base);
-    }
 }
 

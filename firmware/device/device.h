@@ -5,10 +5,10 @@
 // TITLE:  Device setup for examples.
 //
 //#############################################################################
-//
-// $Release Date: $
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2013-2023 Texas Instruments Incorporated - http://www.ti.com/
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -384,7 +384,7 @@ extern uint16_t Device_bootCPU2(uint32_t ulBootMode);
 //! @return None
 //
 //*****************************************************************************
-extern void __error__(const char *filename, uint32_t line);
+extern void __error__(char *filename, uint32_t line);
 extern void Example_setResultPass(void);
 extern void Example_setResultFail(void);
 extern void Example_done(void);

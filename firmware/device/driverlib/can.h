@@ -5,8 +5,10 @@
 // TITLE:  C28x CAN driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -308,10 +310,10 @@ typedef enum
 static inline bool
 CAN_isBaseValid(uint32_t base)
 {
-    return(
+	return(
            (base == CANA_BASE) ||
            (base == CANB_BASE)
-          );
+		  );
 }
 #endif
 
@@ -348,7 +350,7 @@ CAN_writeDataReg(const uint16_t *const data, uint32_t address,
     // Check the dataReg.
     //
     ASSERT(dataReg != 0U);
-
+    
     //
     // Loop always copies 1 byte per iteration.
     //
@@ -358,103 +360,6 @@ CAN_writeDataReg(const uint16_t *const data, uint32_t address,
         // Write out the data 8 bits at a time.
         //
         HWREGB(dataReg) = data[idx];
-
-        dataReg++;
-    }
-}
-
-//*****************************************************************************
-//
-//! \internal
-//!
-//! Copies data (all 16bits) from a buffer to the CAN Data registers.
-//!
-//! \param data is a pointer to the data to be written out to the CAN
-//! controller's data registers.
-//! \param address is a uint32_t value for the first register of the
-//! CAN controller's data registers.  For example, in order to use the IF1
-//! register set on CAN controller 0, the value would be: \b CANA_BASE \b +
-//! \b CAN_O_IF1DATA.
-//! \param size is the number of bytes to copy into the CAN controller.
-//!
-//! This function takes the steps necessary to copy data from a contiguous
-//! buffer in memory into the non-contiguous data registers used by the CAN
-//! controller.
-//!
-//! \return None.
-//
-//*****************************************************************************
-
-static inline void
-CAN_writeDataReg_16bit(const uint16_t *const data, uint32_t address,
-                 uint32_t size)
-{
-    uint32_t idx;
-    uint32_t dataReg = address;
-
-    //
-    // Check the dataReg.
-    //
-    ASSERT(dataReg != 0U);
-
-    //
-    // Loop always copies 1 byte per iteration.
-    //
-    for(idx = 0U; idx < size; idx++)
-    {
-        //
-        // Write out the data 8 bits at a time.
-        //
-        HWREGB(dataReg) = (uint32_t)((data[idx / 2]) >> ((idx % 2UL) * 8UL));
-
-        dataReg++;
-    }
-}
-
-
-//*****************************************************************************
-//
-//! \internal
-//!
-//! Copies data (all 32bits) from a buffer to the CAN Data registers.
-//!
-//! \param data is a pointer to the data to be written out to the CAN
-//! controller's data registers.
-//! \param address is a uint32_t value for the first register of the
-//! CAN controller's data registers.  For example, in order to use the IF1
-//! register set on CAN controller 0, the value would be: \b CANA_BASE \b +
-//! \b CAN_O_IF1DATA.
-//! \param size is the number of bytes to copy into the CAN controller.
-//!
-//! This function takes the steps necessary to copy data from a contiguous
-//! buffer in memory into the non-contiguous data registers used by the CAN
-//! controller.
-//!
-//! \return None.
-//
-//*****************************************************************************
-
-static inline void
-CAN_writeDataReg_32bit(const uint32_t *const data, uint32_t address,
-                 uint32_t size)
-{
-    uint32_t idx;
-    uint32_t dataReg = address;
-
-    //
-    // Check the dataReg.
-    //
-    ASSERT(dataReg != 0U);
-
-    //
-    // Loop always copies 1 byte per iteration.
-    //
-    for(idx = 0U; idx < size; idx++)
-    {
-        //
-        // Write out the data 8 bits at a time.
-        //
-        HWREGB(dataReg) = ((data[idx / 4]) >> ((idx % 4UL) * 8UL));
 
         dataReg++;
     }
@@ -927,7 +832,7 @@ CAN_enableAutoBusOn(uint32_t base)
 //! Sets the time before a Bus-Off recovery sequence is started.
 //!
 //! \param base is the base address of the CAN controller.
-//! \param onTime is number of clock cycles before a Bus-Off recovery sequence
+//! \param time is number of clock cycles before a Bus-Off recovery sequence
 //!        is started.
 //!
 //! This function sets the number of clock cycles before a Bus-Off recovery
@@ -939,7 +844,7 @@ CAN_enableAutoBusOn(uint32_t base)
 //
 //*****************************************************************************
 static inline void
-CAN_setAutoBusOnTime(uint32_t base, uint32_t onTime)
+CAN_setAutoBusOnTime(uint32_t base, uint32_t time)
 {
     //
     // Check the arguments.
@@ -949,7 +854,7 @@ CAN_setAutoBusOnTime(uint32_t base, uint32_t onTime)
     //
     // Set bus-off timer value
     //
-    HWREG_BP(base + CAN_O_ABOTR) = onTime;
+    HWREG_BP(base + CAN_O_ABOTR) = time;
 }
 
 //*****************************************************************************
@@ -1517,21 +1422,21 @@ CAN_initModule(uint32_t base);
 //! Sets the CAN Bit Timing based on requested Bit Rate.
 //!
 //! \param base is the base address of the CAN controller.
-//! \param clockFreq is the CAN module clock frequency before the bit rate
+//! \param clock is the CAN module clock frequency before the bit rate
 //!        prescaler (Hertz)
 //! \param bitRate is the desired bit rate (bits/sec)
 //! \param bitTime is the number of time quanta per bit required for desired
 //!        bit time (Tq) and must be in the range from 8 to 25
 //!
 //! This function sets the CAN bit timing values for the bit rate passed in the
-//! \e bitRate and \e bitTime parameters based on the \e clockFreq parameter.  The
+//! \e bitRate and \e bitTime parameters based on the \e clock parameter.  The
 //! CAN bit clock is calculated to be an average timing value that should work
 //! for most systems.  If tighter timing requirements are needed, then the
 //! CAN_setBitTiming() function is available for full customization of all of
 //! the CAN bit timing values.
 //!
-//! \note Not all bit-rate and bit-time combinations are valid.
-//!       For combinations that would yield the correct bit-rate,
+//! \note Not all bit-rate and bit-time combinations are valid. 
+//!       For combinations that would yield the correct bit-rate, 
 //!       refer to the DCAN_CANBTR_values.xlsx file in the "docs" directory.
 //!       The CANBTR register values calculated by the function CAN_setBitRate
 //!       may not be suitable for your network parameters. If this is the case
@@ -1543,7 +1448,7 @@ CAN_initModule(uint32_t base);
 //
 //*****************************************************************************
 extern void
-CAN_setBitRate(uint32_t base, uint32_t clockFreq, uint32_t bitRate,
+CAN_setBitRate(uint32_t base, uint32_t clock, uint32_t bitRate,
                uint16_t bitTime);
 
 //*****************************************************************************
@@ -1675,95 +1580,6 @@ CAN_sendMessage(uint32_t base, uint32_t objID, uint16_t msgLen,
 
 //*****************************************************************************
 //
-//! Sends a Message Object
-//!
-//! \param base is the base address of the CAN controller.
-//! \param objID is the object number to configure (1-32).
-//! \param msgLen is the number of bytes of data in the message object (0-8)
-//! \param msgData is a pointer to the message object's data (all 16 bits are sent)
-//!
-//! This function is used to transmit a message object and the message data,
-//! if applicable.
-//!
-//! \note The message object requested by the \e objID must first be setup
-//! using the CAN_setupMessageObject() function.
-//!
-//! \return None.
-//
-//*****************************************************************************
-
-extern void
-CAN_sendMessage_16bit(uint32_t base, uint32_t objID, uint16_t msgLen,
-                const uint16_t *msgData);
-
-//*****************************************************************************
-//
-//! Sends a Message Object
-//!
-//! \param base is the base address of the CAN controller.
-//! \param objID is the object number to configure (1-32).
-//! \param msgLen is the number of bytes of data in the message object (0-8)
-//! \param msgData is a pointer to the message object's data (all 32 bits are sent)
-//!
-//! This function is used to transmit a message object and the message data,
-//! if applicable.
-//!
-//! \note The message object requested by the \e objID must first be setup
-//! using the CAN_setupMessageObject() function.
-//!
-//! \return None.
-//
-//*****************************************************************************
-
-extern void
-CAN_sendMessage_32bit(uint32_t base, uint32_t objID, uint16_t msgLen,
-                const uint32_t *msgData);
-
-//*****************************************************************************
-//
-//! Sends a Message Object while dynamically updating data length
-//!
-//! \param base is the base address of the CAN controller.
-//! \param objID is the object number to configure (1-32).
-//! \param msgLen is the number of bytes of data in the message object (0-8)
-//! \param msgData is a pointer to the message object's data
-//!
-//! This function is used to transmit a message object and the message data,
-//! if applicable and can be used to dynamically update the data length
-//! for every subsequent call of this function.
-//!
-//! \note The message object requested by the \e objID must first be setup
-//! using the CAN_setupMessageObject() function.
-//!
-//! \return None.
-//
-//*****************************************************************************
-
-extern void
-CAN_sendMessage_updateDLC(uint32_t base, uint32_t objID, uint16_t msgLen,
-                  const uint16_t *msgData);
-
-//*****************************************************************************
-//
-//! Sends a Remote Request Message Object
-//!
-//! \param base is the base address of the CAN controller.
-//! \param objID is the object number to configure (1-32).
-//!
-//! This function is used to transmit a remote request message object.
-//!
-//! \note The message object requested by the \e objID must first be setup
-//! using the CAN_setupMessageObject() function with CAN_MSG_OBJ_TYPE_TX_REMOTE
-//! as msgType flag.
-//!
-//! \return None.
-//
-//*****************************************************************************
-extern void
-CAN_sendRemoteRequestMessage(uint32_t base, uint32_t objID);
-
-//*****************************************************************************
-//
 //! Reads the data in a Message Object
 //!
 //! \param base is the base address of the CAN controller.
@@ -1794,8 +1610,8 @@ CAN_readMessage(uint32_t base, uint32_t objID,
 //!
 //! \param base is the base address of the CAN controller.
 //! \param objID is the object number to read (1-32).
-//! \param frameType is a pointer to the CAN_MsgFrameType to store the message
-//!        type that has been received in the mailbox
+//! \param frameType is a pointer to the CAN_MsgFrameType to store the message 
+//!        type that has been received in the mailbox 
 //! The \e frameType parameter shall be filled as of the following values:
 //! - \b CAN_MSG_FRAME_STD - Standard 11 bit identifier
 //! - \b CAN_MSG_FRAME_EXT - Extended 29 bit identifier
@@ -1805,8 +1621,8 @@ CAN_readMessage(uint32_t base, uint32_t objID,
 //! \param msgData is a pointer to the array to store the message data
 //! Filled with read Data when the return value is true for this function.
 //!
-//! This function is used to read the data contents and the Message ID
-//! of the specified message object in the CAN controller.The Message ID returned
+//! This function is used to read the data contents and the Message ID 
+//! of the specified message object in the CAN controller.The Message returned 
 //! is stored in the \e msgID parameter and its type in \e frameType parameter.
 //! The data returned is stored in the \e msgData parameter.
 //!
@@ -1834,7 +1650,7 @@ extern bool CAN_readMessageWithID(uint32_t base,
 //! \param interface is the interface to use for the transfer. Valid value are
 //!        1 or 2.
 //! \param objID is the object number to transfer (1-32).
-//! \param direction is the direction of data transfer. False is Message RAM
+//! \param direction is the direction of data transfer. False is Message RAM 
 //!        to IF, True is IF to Message RAM.
 //!
 //! This function transfers the contents of the interface registers to message
@@ -1863,41 +1679,6 @@ CAN_transferMessage(uint32_t base, uint16_t interface, uint32_t objID,
 //*****************************************************************************
 extern void
 CAN_clearMessage(uint32_t base, uint32_t objID);
-
-//*****************************************************************************
-//
-//! Disables specific message object
-//!
-//! \param base is the base address of the CAN controller.
-//! \param objID is the message object number to disable (1-32).
-//!
-//! This function disables the specific message object. Once the message object
-//! has been disabled it will be ignored by the message handler until it
-//! is configured again.
-//!
-//! \return None.
-//
-//*****************************************************************************
-extern void
-CAN_disableMessageObject(uint32_t base, uint32_t objID);
-
-//*****************************************************************************
-//
-//! Disables all message objects
-//!
-//! \param base is the base address of the CAN controller.
-//!
-//! This function disables all message objects. Once a message object
-//! has been disabled it will be ignored by the message handler until it
-//! is configured again. All message objects are disabled automatically on
-//! reset, however this function can be used to restart CAN operations
-//! without an external reset.
-//!
-//! \return None.
-//
-//*****************************************************************************
-extern void
-CAN_disableAllMessageObjects(uint32_t base);
 
 //*****************************************************************************
 //

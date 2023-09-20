@@ -5,8 +5,10 @@
 // TITLE:  C28x system control driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -83,6 +85,8 @@ SYSCTL_DELAY;
 static void
 SysCtl_pollCpuTimer(void)
 {
+    uint16_t loopCount = 0U;
+
     //
     // Delay for 1 ms while the XTAL powers up
     //
@@ -91,20 +95,32 @@ SysCtl_pollCpuTimer(void)
     SysCtl_delay(2000);
 
     //
-    // Wait for cpu timer 2 to overflow
+    // Clear and overflow cpu timer 2 4x to guarantee operation
     //
-    while(CPUTimer_getTimerOverflowStatus(CPUTIMER2_BASE) == false);
+    do
     {
         //
-        // If your application is stuck in this loop, please check if the
-        // input clock source is valid.
+        // Wait for cpu timer 2 to overflow
         //
-    }
+        while(CPUTimer_getTimerOverflowStatus(CPUTIMER2_BASE)==false);
+        {
+            //
+            // If your application is stuck in this loop, please check if the
+            // input clock source is valid.
+            //
+        }
 
-    //
-    // Clear cpu timer 2 overflow flag
-    //
-    CPUTimer_clearOverflowFlag(CPUTIMER2_BASE);
+        //
+        // Clear cpu timer 2 overflow flag
+        //
+        CPUTimer_clearOverflowFlag(CPUTIMER2_BASE);
+
+        //
+        // Increment the counter
+        //
+        loopCount++;
+
+    }while(loopCount < 4U);
 }
 
 //*****************************************************************************
@@ -139,8 +155,8 @@ SysCtl_getClock(uint32_t clockInHz)
         oscSource = HWREG(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL1) &
                     (uint32_t)SYSCTL_CLKSRCCTL1_OSCCLKSRCSEL_M;
 
-        if((oscSource == (SYSCTL_OSCSRC_OSC2 >> SYSCTL_OSCSRC_S)) ||
-           (oscSource == (SYSCTL_OSCSRC_OSC1 >> SYSCTL_OSCSRC_S)))
+        if((oscSource == ((uint32_t)SYSCTL_OSCSRC_OSC2 >> SYSCTL_OSCSRC_S)) ||
+           (oscSource == ((uint32_t)SYSCTL_OSCSRC_OSC1 >> SYSCTL_OSCSRC_S)))
         {
             clockOut = SYSCTL_DEFAULT_OSC_FREQ;
         }
@@ -204,7 +220,7 @@ uint32_t SysCtl_getAuxClock(uint32_t clockInHz)
     // If one of the internal oscillators is being used, start from the
     // known default frequency.  Otherwise, use clockInHz parameter.
     //
-    if(oscSource == (SYSCTL_AUXPLL_OSCSRC_OSC2 >> SYSCTL_OSCSRC_S))
+    if(oscSource == ((uint32_t)SYSCTL_AUXPLL_OSCSRC_OSC2 >> SYSCTL_OSCSRC_S))
     {
         //
         // 10MHz Internal Clock
@@ -1061,7 +1077,7 @@ SysCtl_selectXTAL(void)
     uint16_t t2TCR, t2TPR, t2TPRH, t2CLKCTL;
     uint32_t t2PRD;
 
-    //
+	//
     // Backup CPU timer2 settings
     //
     t2CLKCTL = HWREGH(CPUSYS_BASE + SYSCTL_O_TMR2CLKCTL);
@@ -1070,37 +1086,15 @@ SysCtl_selectXTAL(void)
     t2TPR = HWREGH(CPUTIMER2_BASE + CPUTIMER_O_TPR);
     t2TPRH = HWREGH(CPUTIMER2_BASE + CPUTIMER_O_TPRH);
 
-    //
-    // Backup AUX clock settings
-    //
-    uint16_t clksrcctl2 = HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL2);
-    uint16_t auxpllctl1 = HWREGH(CLKCFG_BASE + SYSCTL_O_AUXPLLCTL1);
-    uint16_t auxclkdivsel = HWREGH(CLKCFG_BASE + SYSCTL_O_AUXCLKDIVSEL);
 
-    //
-    // Set AUX clock source to XTAL, bypass mode.
-    // AUXCLK is used as the CPUTimer Clock source. SYSCLK frequency must be
-    // atleast twice the frequency of AUXCLK. SYSCLK = INTOSC2(10MHz)
-    // Set the AUX divider to 8. The above condition will be met for XTAL
-    // frequencies up to 40MHz
-    //
-    EALLOW;
-    HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL2) =
-            (HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL2) &
-             ~(SYSCTL_CLKSRCCTL2_AUXOSCCLKSRCSEL_M)) |
-            (1U << SYSCTL_CLKSRCCTL2_AUXOSCCLKSRCSEL_S);
-    HWREGH(CLKCFG_BASE + SYSCTL_O_AUXPLLCTL1) = 0x0U;
-    HWREGH(CLKCFG_BASE + SYSCTL_O_AUXCLKDIVSEL) = SYSCTL_AUXPLLCLK_DIV_8;
+	//
+	// Disable cpu timer 2 interrupt
+	//
+	CPUTimer_disableInterrupt(CPUTIMER2_BASE);
 
-
-    //
-    // Disable cpu timer 2 interrupt
-    //
-    CPUTimer_disableInterrupt(CPUTIMER2_BASE);
-
-    //
-    // Stop cpu timer 2 if running
-    //
+	//
+	// Stop cpu timer 2 if running
+	//
     CPUTimer_stopTimer(CPUTIMER2_BASE);
 
     //
@@ -1111,7 +1105,7 @@ SysCtl_selectXTAL(void)
     //
     // Set cpu timer 2 clock source to XTAL
     //
-    CPUTimer_selectClockSource(CPUTIMER2_BASE, CPUTIMER_CLOCK_SOURCE_AUX,
+    CPUTimer_selectClockSource(CPUTIMER2_BASE, CPUTIMER_CLOCK_SOURCE_XTAL,
                                CPUTIMER_CLOCK_PRESCALER_1);
 
     //
@@ -1143,7 +1137,7 @@ SysCtl_selectXTAL(void)
     HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL1) =
     ((HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL1) &
       (~SYSCTL_CLKSRCCTL1_OSCCLKSRCSEL_M)) |
-     (SYSCTL_OSCSRC_XTAL >> SYSCTL_OSCSRC_S));
+     ((uint32_t)SYSCTL_OSCSRC_XTAL >> SYSCTL_OSCSRC_S));
     EDIS;
 
     //
@@ -1169,7 +1163,7 @@ SysCtl_selectXTAL(void)
         HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL1) =
         ((HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL1) &
           (~SYSCTL_CLKSRCCTL1_OSCCLKSRCSEL_M)) |
-         (SYSCTL_OSCSRC_XTAL >> SYSCTL_OSCSRC_S));
+         ((uint32_t)SYSCTL_OSCSRC_XTAL >> SYSCTL_OSCSRC_S));
         EDIS;
     }
 
@@ -1188,15 +1182,6 @@ SysCtl_selectXTAL(void)
     HWREGH(CPUTIMER2_BASE + CPUTIMER_O_TPR) = t2TPR;
     HWREGH(CPUTIMER2_BASE + CPUTIMER_O_TPRH) = t2TPRH;
     HWREGH(CPUTIMER2_BASE + CPUTIMER_O_TCR) |= CPUTIMER_TCR_TRB;
-
-    //
-    // Restore AUX clock settings
-    //
-    HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL2) = clksrcctl2;
-    HWREGH(CLKCFG_BASE + SYSCTL_O_AUXPLLCTL1) = auxpllctl1;
-    HWREGH(CLKCFG_BASE + SYSCTL_O_AUXCLKDIVSEL) = auxclkdivsel;
-    EDIS;
-
     EDIS;
 }
 
@@ -1208,8 +1193,8 @@ SysCtl_selectXTAL(void)
 void
 SysCtl_selectOscSource(uint32_t oscSource)
 {
-    ASSERT((oscSource == SYSCTL_OSCSRC_OSC1) ||
-           (oscSource == SYSCTL_OSCSRC_OSC2) ||
+    ASSERT((oscSource == SYSCTL_OSCSRC_OSC1) |
+           (oscSource == SYSCTL_OSCSRC_OSC2) |
            (oscSource == SYSCTL_OSCSRC_XTAL));
 
     //
@@ -1257,7 +1242,7 @@ SysCtl_selectOscSource(uint32_t oscSource)
             HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL1) =
                    (HWREGH(CLKCFG_BASE + SYSCTL_O_CLKSRCCTL1) &
                     ~SYSCTL_CLKSRCCTL1_OSCCLKSRCSEL_M) |
-                   (SYSCTL_OSCSRC_OSC1 >> SYSCTL_OSCSRC_S);
+                   ((uint32_t)SYSCTL_OSCSRC_OSC1 >> SYSCTL_OSCSRC_S);
 
             SYSCTL_CLKSRCCTL1_DELAY;
 
@@ -1286,8 +1271,6 @@ SysCtl_selectOscSource(uint32_t oscSource)
 void
 SysCtl_selectOscSourceAuxPLL(uint32_t oscSource)
 {
-    bool status = false;
-
     EALLOW;
 
     switch(oscSource)

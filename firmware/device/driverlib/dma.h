@@ -5,8 +5,10 @@
 // TITLE:  C28x DMA driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -177,7 +179,6 @@ typedef enum
     DMA_TRIGGER_SPIBRX       = 112,
     DMA_TRIGGER_SPICTX       = 113,
     DMA_TRIGGER_SPICRX       = 114,
-
     DMA_TRIGGER_CLB1INT      = 127,
     DMA_TRIGGER_CLB2INT      = 128,
     DMA_TRIGGER_CLB3INT      = 129,
@@ -212,46 +213,6 @@ typedef enum
     //! Continue DMA operation regardless of emulation suspend
     DMA_EMULATION_FREE_RUN
 } DMA_EmulationMode;
-
-//*****************************************************************************
-//
-//! Values that can be passed to DMA_configChannel() as the
-//! configure parameter.
-//
-//*****************************************************************************
-typedef struct
-{
-    DMA_Trigger          transferTrigger;  //DMA transfer triggers
-    DMA_InterruptMode    interruptMode;    //Channel interrupt mode
-    bool                 enableInterrupt;  //Enable/Disable interrupt mode
-    uint32_t             configSize;    //Data bus width (16 or 32 bits)
-    uint32_t             transferMode;  //Burst transfer mode
-    uint32_t             reinitMode;    //DMA reinitialization mode
-    uint32_t             burstSize;     //Number of words transferred per burst
-    uint32_t             transferSize;  //Number of bursts per transfer
-    //! Number of bursts to be transferred before a wrap of the source address
-    //! occurs.
-    uint32_t             srcWrapSize;
-    //! Number of bursts to be transferred before a wrap of the destination
-    //! address occurs.
-    uint32_t             destWrapSize;
-    uint32_t             destAddr;    //destination address
-    uint32_t             srcAddr;     //source address
-    //! Amount to inc or dec the source address after each word of a burst
-    int16_t              srcBurstStep;
-    //! Amount to inc or dec the destination address after each word of a burst
-    int16_t              destBurstStep;
-    //! Amount to inc or dec the source address after each burst of a transfer
-    int16_t              srcTransferStep;
-    //! Amount to inc or dec the destination address after each burst of a
-    //! transfer
-    int16_t              destTransferStep;
-    //! Amount to inc or dec the source address when the wrap occurs
-    int16_t              srcWrapStep;
-    //! Amount to inc or dec the destination address when the wrap occurs
-    int16_t              destWrapStep;
-
-} DMA_ConfigParams;
 
 //*****************************************************************************
 //
@@ -305,32 +266,6 @@ DMA_initController(void)
 
     EDIS;
 }
-
-//*****************************************************************************
-//
-//! Channel Soft Reset
-//!
-//! \param base is the base address of the DMA channel control registers.
-//!
-//! This function does a soft reset to place the channel into its default state
-//!
-//! \return None.
-//
-//*****************************************************************************
-static inline void
-DMA_triggerSoftReset(uint32_t base)
-{
-    EALLOW;
-
-    //
-    // Set the soft reset bit. One NOP is required after SOFTRESET.
-    //
-    HWREGH(base + DMA_O_CONTROL) |= DMA_CONTROL_SOFTRESET;
-    NOP;
-
-    EDIS;
-}
-
 //*****************************************************************************
 //
 //! Sets DMA emulation mode.
@@ -481,124 +416,6 @@ DMA_clearTriggerFlag(uint32_t base)
     EALLOW;
     HWREGH(base + DMA_O_CONTROL) |= DMA_CONTROL_PERINTCLR;
     EDIS;
-}
-
-//*****************************************************************************
-//
-//! Gets the status of a DMA channel's Transfer Status Flag.
-//!
-//! \param base is the base address of the DMA channel control registers.
-//!
-//! This function returns \b true if the Transfer Status Flag is set, which
-//! means a DMA transfer has begun.
-//! This flag is cleared when TRANSFER_COUNT reaches zero, or when the
-//! HARDRESET or SOFTRESET bit is set.
-//!
-//! \return Returns \b true if the Transfer Status Flag is set. Returns \b false
-//! otherwise.
-//
-//*****************************************************************************
-static inline bool
-DMA_getTransferStatusFlag(uint32_t base)
-{
-    //
-    // Check the arguments.
-    //
-    ASSERT(DMA_isBaseValid(base));
-
-    //
-    // Read the Transfer Status Flag and return appropriately.
-    //
-    return((HWREGH(base + DMA_O_CONTROL) & DMA_CONTROL_TRANSFERSTS) != 0U);
-}
-
-//*****************************************************************************
-//
-//! Gets the status of a DMA channel's Burst Status Flag.
-//!
-//! \param base is the base address of the DMA channel control registers.
-//!
-//! This function returns \b true if the Burst Status Flag is set, which
-//! means a DMA burst has begun.
-//! This flag is cleared when BURST_COUNT reaches zero, or when the
-//! HARDRESET or SOFTRESET bit is set.
-//!
-//! \return Returns \b true if the Burst Status Flag is set. Returns \b false
-//! otherwise.
-//
-//*****************************************************************************
-static inline bool
-DMA_getBurstStatusFlag(uint32_t base)
-{
-    //
-    // Check the arguments.
-    //
-    ASSERT(DMA_isBaseValid(base));
-
-    //
-    // Read the Burst Status Flag and return appropriately.
-    //
-    return((HWREGH(base + DMA_O_CONTROL) & DMA_CONTROL_BURSTSTS) != 0U);
-}
-
-//*****************************************************************************
-//
-//! Gets the status of a DMA channel's Run Status Flag.
-//!
-//! \param base is the base address of the DMA channel control registers.
-//!
-//! This function returns \b true if the Run Status Flag is set, which
-//! means the DMA channel is enabled.
-//! This flag is cleared when a transfer completes (TRANSFER_COUNT = 0) and
-//! continuous mode is disabled, or when the HARDRESET, SOFTRESET, or HALT bit
-//! is set.
-//!
-//! \return Returns \b true if the channel is enabled. Returns \b false
-//! otherwise.
-//
-//*****************************************************************************
-static inline bool
-DMA_getRunStatusFlag(uint32_t base)
-{
-    //
-    // Check the arguments.
-    //
-    ASSERT(DMA_isBaseValid(base));
-
-    //
-    // Read the Run Status Flag and return appropriately.
-    //
-    return((HWREGH(base + DMA_O_CONTROL) & DMA_CONTROL_RUNSTS) != 0U);
-}
-
-//*****************************************************************************
-//
-//! Gets the status of a DMA channel's Overflow Flag.
-//!
-//! \param base is the base address of the DMA channel control registers.
-//!
-//! This function returns \b true if the Overflow Flag is set, which
-//! means peripheral event trigger was received while Peripheral Event Trigger
-//! Flag was already set.
-//! This flag can be cleared by writing to ERRCLR bit, using the function
-//! DMA_clearErrorFlag().
-//!
-//! \return Returns \b true if the channel is enabled. Returns \b false
-//! otherwise.
-//
-//*****************************************************************************
-static inline bool
-DMA_getOverflowFlag(uint32_t base)
-{
-    //
-    // Check the arguments.
-    //
-    ASSERT(DMA_isBaseValid(base));
-
-    //
-    // Read the Overflow Flag and return appropriately.
-    //
-    return((HWREGH(base + DMA_O_CONTROL) & DMA_CONTROL_OVRFLG) != 0U);
 }
 
 //*****************************************************************************
@@ -976,22 +793,6 @@ DMA_configDestAddress(uint32_t base, const void *destAddr)
 
     EDIS;
 }
-
-//*****************************************************************************
-//
-//! Setup DMA to transfer data on the specified channel.
-//!
-//! \param base is Base address of the DMA channel control register
-//! \param *transfParams configuration parameter
-//!                      Refer struct #DMA_ConfigParams
-//!
-//! This function configures the DMA transfer on the specified channel.
-//!
-//! \return None.
-//
-//*****************************************************************************
-extern void
-DMA_configChannel(uint32_t base, const DMA_ConfigParams *transfParams);
 
 //*****************************************************************************
 //

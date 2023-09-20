@@ -5,8 +5,10 @@
 // TITLE:  C28x Driver for the DCSM security module.
 //
 //#############################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -211,12 +213,12 @@ DCSM_getZone1FlashEXEStatus(DCSM_Sector sector)
         // Get the EXE status register
         //
         regValue = HWREGH(DCSM_Z1_BASE + DCSM_O_Z1_EXEONLYSECTR);
+
         //
         // Get the EXE status of the Flash Sector
         //
-        status = (DCSM_EXEOnlyStatus)((uint16_t)
-                                      ((regValue >> (uint16_t)sector) &
-                                       0x01U));
+        status = (DCSM_EXEOnlyStatus)((regValue >> (uint16_t)sector) &
+                                    (uint16_t)0x01U);
     }
     return(status);
 }
@@ -230,7 +232,7 @@ DCSM_EXEOnlyStatus
 DCSM_getZone1RAMEXEStatus(DCSM_RAMModule module)
 {
     ASSERT(module != DCSM_CLA);
-    uint32_t status;
+    DCSM_EXEOnlyStatus status;
 
     //
     // Check if module belongs to this zone
@@ -244,10 +246,10 @@ DCSM_getZone1RAMEXEStatus(DCSM_RAMModule module)
         //
         // Get the EXE status of the RAM Module
         //
-        status = (uint16_t)((HWREGH(DCSM_Z1_BASE + DCSM_O_Z1_EXEONLYRAMR) >>
-                             (uint16_t)module) & 0x01U);
+        status = (DCSM_EXEOnlyStatus)((HWREGH(DCSM_Z1_BASE +
+           DCSM_O_Z1_EXEONLYRAMR) >> (uint16_t)module) & (uint16_t)0x01U);
     }
-    return((DCSM_EXEOnlyStatus)status);
+    return(status);
 }
 
 //*****************************************************************************
@@ -274,11 +276,12 @@ DCSM_getZone2FlashEXEStatus(DCSM_Sector sector)
         // Get the EXE status register
         //
         regValue = HWREGH(DCSM_Z2_BASE + DCSM_O_Z2_EXEONLYSECTR);
+
         //
         // Get the EXE status of the Flash Sector
         //
-        status = (DCSM_EXEOnlyStatus)((uint16_t)((regValue >>
-                                                  (uint16_t)sector) & 0x01U));
+        status = (DCSM_EXEOnlyStatus)((regValue >> (uint16_t)sector) &
+                                    (uint16_t)0x01U);
     }
 
     return(status);
@@ -293,7 +296,7 @@ DCSM_EXEOnlyStatus
 DCSM_getZone2RAMEXEStatus(DCSM_RAMModule module)
 {
     ASSERT(module != DCSM_CLA);
-    uint32_t status;
+    DCSM_EXEOnlyStatus status;
 
     //
     // Check if module belongs to this zone
@@ -307,10 +310,10 @@ DCSM_getZone2RAMEXEStatus(DCSM_RAMModule module)
         //
         // Get the EXE status of the RAM Module
         //
-        status = (uint16_t)((HWREGH(DCSM_Z2_BASE +
-               DCSM_O_Z2_EXEONLYRAMR) >> (uint16_t)module) & 0x01U);
+        status = (DCSM_EXEOnlyStatus)((HWREGH(DCSM_Z2_BASE +
+               DCSM_O_Z2_EXEONLYRAMR) >> (uint16_t)module) & (uint16_t)0x01U);
     }
-    return((DCSM_EXEOnlyStatus)status);
+    return(status);
 }
 
 //*****************************************************************************

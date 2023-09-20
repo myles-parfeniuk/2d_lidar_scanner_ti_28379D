@@ -5,8 +5,10 @@
 // TITLE:  C28x CLB driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -373,7 +375,6 @@ typedef enum
     CLB_GLOBAL_IN_MUX_CLB_AUXSIG5       = 69,  //!< CLB X-BAR AUXSIG5
     CLB_GLOBAL_IN_MUX_CLB_AUXSIG6       = 70,  //!< CLB X-BAR AUXSIG6
     CLB_GLOBAL_IN_MUX_CLB_AUXSIG7       = 71,  //!< CLB X-BAR AUXSIG7
-
 } CLB_GlobalInputMux;
 
 //*****************************************************************************
@@ -665,7 +666,7 @@ static inline uint32_t CLB_getGPREG(uint32_t base)
 {
     ASSERT(CLB_isBaseValid(base));
 
-    return(HWREG(base + CLB_LOGICCTL + CLB_O_GP_REG));
+    return HWREG(base + CLB_LOGICCTL + CLB_O_GP_REG);
 }
 
 //*****************************************************************************
@@ -1256,7 +1257,7 @@ extern void CLB_clearFIFOs(uint32_t base);
 //! \return None.
 //
 //*****************************************************************************
-extern void CLB_writeFIFOs(uint32_t base, const uint32_t pullData[]);
+extern void CLB_writeFIFOs(uint32_t base ,const uint32_t pullData[]);
 
 //*****************************************************************************
 //

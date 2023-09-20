@@ -5,8 +5,10 @@
 // TITLE:  Type definitions used in driverlib functions.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -46,20 +48,12 @@
 // Macros for hardware access
 //
 //*****************************************************************************
-#if defined(__TMS320C28XX_CLA__)
-    #define HWREG(x)                                                          \
-            (*((volatile uint32_t *)((uintptr_t)(x))))
-    #define HWREGH(x)                                                         \
-            (*((volatile uint16_t *)((uintptr_t)(x))))
-#else
-    #define HWREG(x)                                                          \
-            (*((volatile uint32_t *)(x)))
-    #define HWREGH(x)                                                         \
-            (*((volatile uint16_t *)(x)))
-#endif
-
+#define HWREG(x)                                                              \
+        (*((volatile uint32_t *)((uintptr_t)(x))))
 #define HWREG_BP(x)                                                           \
         __byte_peripheral_32((uint32_t *)(x))
+#define HWREGH(x)                                                             \
+        (*((volatile uint16_t *)((uintptr_t)(x))))
 #define HWREGB(x)                                                             \
         __byte((int16_t *)(x),0)
 
@@ -145,13 +139,5 @@ typedef long double   float64_t;
 extern int16_t &__byte(int16_t *array, uint16_t byte_index);
 extern uint32_t &__byte_peripheral_32(uint32_t *x);
 #endif
-
-//
-// C++ Bool Compatibility
-//
-#if defined(__cplusplus)
-typedef bool _Bool;
-#endif
-
 
 #endif // HW_TYPES_H

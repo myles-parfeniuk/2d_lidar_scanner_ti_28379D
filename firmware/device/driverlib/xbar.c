@@ -5,8 +5,10 @@
 // TITLE:  C28x X-BAR driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -116,9 +118,9 @@ XBAR_setEPWMMuxConfig(XBAR_TripNum trip, XBAR_EPWMMuxConfig muxConfig)
     //
     EALLOW;
 
-    HWREG(XBAR_EPWM_CFG_REG_BASE + (uint32_t)offset) =
-        (HWREG(XBAR_EPWM_CFG_REG_BASE + (uint32_t)offset) & ~(0x3UL << shift)) |
-        (((uint32_t)muxConfig & 0x3UL) << shift);
+    HWREG(XBAR_EPWM_CFG_REG_BASE + offset) =
+        (HWREG(XBAR_EPWM_CFG_REG_BASE + offset) & ~((uint32_t)0x3U << shift)) |
+        (((uint32_t)muxConfig & 0x3U) << shift);
 
     EDIS;
 }
@@ -158,9 +160,9 @@ XBAR_setCLBMuxConfig(XBAR_AuxSigNum auxSignal, XBAR_CLBMuxConfig muxConfig)
     EALLOW;
 
 
-    HWREG(XBAR_CLB_CFG_REG_BASE + (uint32_t)offset) =
-        (HWREG(XBAR_CLB_CFG_REG_BASE + (uint32_t)offset) & ~(0x3UL << shift)) |
-        (((uint32_t)muxConfig & 0x3UL) << shift);
+    HWREG(XBAR_CLB_CFG_REG_BASE + offset) =
+        (HWREG(XBAR_CLB_CFG_REG_BASE + offset) & ~((uint32_t)0x3U << shift)) |
+        (((uint32_t)muxConfig & 0x3U) << shift);
 
     EDIS;
 }
@@ -248,6 +250,6 @@ XBAR_clearInputFlag(XBAR_InputFlag inputFlag)
     //
     // Set the bit that clears the X-BAR input latch.
     //
-    inputMask = 1UL << ((uint32_t)inputFlag & XBAR_INPUT_FLG_INPUT_M);
+    inputMask = (uint32_t)1U << ((uint32_t)inputFlag & XBAR_INPUT_FLG_INPUT_M);
     HWREG(XBAR_BASE + offset) = inputMask;
 }

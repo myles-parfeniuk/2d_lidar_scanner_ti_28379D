@@ -5,8 +5,10 @@
 // TITLE:  C28x Driver for the DCSM security module.
 //
 //#############################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -410,13 +412,12 @@ static inline DCSM_MemoryStatus
 DCSM_getRAMZone(DCSM_RAMModule module)
 {
     uint16_t shift = (uint16_t)module * 2U;
-    uint32_t ramStatus;
     //
     //Read the RAMSTAT register for the specific RAM Module.
     //
-    ramStatus = ((HWREG(DCSMCOMMON_BASE + DCSM_O_RAMSTAT) >>
-                                shift) & 0x03U);
-    return((DCSM_MemoryStatus)ramStatus);
+    return((DCSM_MemoryStatus)((HWREG(DCSMCOMMON_BASE + DCSM_O_RAMSTAT) >>
+                                shift) & 0x03U));
+
 }
 
 //*****************************************************************************
@@ -448,7 +449,7 @@ DCSM_getFlashSectorZone(DCSM_Sector sector)
     //
     //Read the SECTSTAT register for the specific Flash Sector.
     //
-    return((DCSM_MemoryStatus)((uint16_t)((sectStat >> shift) & 0x3U)));
+    return((DCSM_MemoryStatus)((sectStat >> shift) & 0x3U));
 }
 
 //*****************************************************************************
@@ -500,10 +501,6 @@ DCSM_getZone2LinkPointerError(void)
 //! passwords into CSM Key registers
 //!
 //! \return None.
-//!
-//! \note This function should not be called in an actual application,
-//! should only be used for once to program the OTP memory. Ensure flash data
-//! cache is disabled before calling this function(Flash_disableCache).
 //
 //*****************************************************************************
 extern void
@@ -522,10 +519,6 @@ DCSM_unlockZone1CSM(const DCSM_CSMPasswordKey * const psCMDKey);
 //! provided passwords into CSM Key registers
 //!
 //! \return None.
-//!
-//! \note This function should not be called in an actual application,
-//! should only be used for once to program the OTP memory. Ensure flash data
-//! cache is disabled before calling this function(Flash_disableCache).
 //
 //*****************************************************************************
 extern void

@@ -5,8 +5,10 @@
 // TITLE:  C28x SPI driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -66,7 +68,6 @@ extern "C"
 #include "inc/hw_types.h"
 #include "inc/hw_spi.h"
 #include "debug.h"
-#include "hw_reg_inclusive_terminology.h"
 
 #ifndef DOXYGEN_PDF_IGNORE
 //*****************************************************************************
@@ -82,190 +83,6 @@ extern "C"
 #define SPI_INT_TXFF              0x0008U //!< TX FIFO level interrupt
 #define SPI_INT_RXFF_OVERFLOW     0x0010U //!< RX FIFO overflow
 #endif
-
-
-//*****************************************************************************
-//
-//! This macro definition is used to transmit a byte of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param txData is the data to be transmitted over SPI
-//!
-//! This macro definition is to transmit a byte of data.
-//! This macro uses SPI_pollingNonFIFOTransaction function
-//! SPI character length is hardcoded to 8 (1 byte = 8 bits)of character length
-//!
-//! \return None.
-//
-//*****************************************************************************
-#define SPI_transmitByte(base, txData)                                         \
-                                SPI_pollingNonFIFOTransaction(base, 8U,  txData)
-
-//*****************************************************************************
-//
-//! This macro definition is used to transmit a 16-bit word of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param txData is the data to be transmitted over SPI
-//!
-//! This macro definition is to transmit a 16-bit word of data.
-//! This macro uses SPI_pollingNonFIFOTransaction function
-//! SPI character length is hardcoded to 16 (16bit word) of character length
-//!
-//! \return None.
-//
-//*****************************************************************************
-#define SPI_transmit16Bits(base, txData)                                       \
-                                SPI_pollingNonFIFOTransaction(base, 16U, txData)
-
-//*****************************************************************************
-//
-//! This macro definition can be used to transmit 'N' bytes of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param txBuffer is the transmit buffer to be transmitted over SPI
-//! \param numOfWords is the number of bytes to be transmitted
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This macro definition can be used to transmit 'N' bytes of data.
-//! This macro definition uses SPI_pollingFIFOTransaction function.
-//!
-//! SPI character length is hardcoded to 8 (8bits) of character length
-//!
-//! \return None.
-//
-//*****************************************************************************
-#define SPI_transmitNBytes(base, txBuffer, numOfWords, txDelay)                \
-      SPI_pollingFIFOTransaction(base, 8U,  txBuffer, NULL, numOfWords, txDelay)
-
-//*****************************************************************************
-//
-//! This macro definition can be used to transmit 'N' 16-bit words of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param txBuffer is the transmit buffer to be transmitted over SPI
-//! \param numOfWords is the number of 16-bit word to be transmitted
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function can be used to transmit 'N' 16-bit words of data.
-//! This function uses SPI_pollingFIFOTransaction function.
-//! SPI character length is hardcoded to 16 (16-bit word)
-//!
-//! \return None.
-//
-//*****************************************************************************
-#define SPI_transmitN16BitWord(base, txBuffer, numOfWords, txDelay)            \
-      SPI_pollingFIFOTransaction(base, 16U, txBuffer, NULL, numOfWords, txDelay)
-
-//*****************************************************************************
-//
-//! This macro definition can be used to transmit 'N' with configurable
-//! SPI character length
-//!
-//! \param base specifies the SPI module base address
-//! \param charLength specifies the SPI character length
-//! \param txBuffer is the transmit buffer to be transmitted over SPI
-//! \param numOfWords is the number of 16-bit word to be transmitted
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This macro definition can be used to transmit 'N' with configurable
-//! SPI character length.
-//!
-//! This macro uses SPIpolling_FIFO_Transaction function.
-//! SPI character length is configurable using charLength variable.
-//!
-//! \return None.
-//
-//*****************************************************************************
-#define SPI_transmitNWordsWithCharLength(base, charLength, txBuffer,           \
-                                         numOfWords, txDelay)                  \
-              SPI_pollingFIFOTransaction(base, charLength, txBuffer, NULL,     \
-                                         numOfWords, txDelay)
-
-//*****************************************************************************
-//
-//! This macro definition is used to receive a byte of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param dummyData is the data which is transmitted to initiate
-//!        SPI transaction to receive SPI data
-//!
-//! This macro definition is to receive a byte of data.
-//! This macro uses SPI_pollingNonFIFOTransaction function
-//! SPI character length is hardcoded to 8 (1byte = 8bits) of character length
-//!
-//! \return the received byte.
-//
-//*****************************************************************************
-#define SPI_receiveByte(base, dummyData)                                       \
-                            SPI_pollingNonFIFOTransaction(base, 8U, dummyData)
-
-//*****************************************************************************
-//
-//! This macro is used to receive 'N' bytes of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param rxBuffer specifies receive buffer which will store the received bytes
-//! \param numOfWords specifies the number of bytes to be received
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function is used to receive 'N' bytes of data
-//! This function uses SPIpolling_FIFO_Transaction function.
-//! SPI character length is hardcoded to 8 (1 byte = 8 bits)
-//!
-//! \return None.
-//
-//*****************************************************************************
-#define SPI_receiveNBytes(base, rxBuffer, numOfWords, txDelay)                 \
-      SPI_pollingFIFOTransaction(base, 8U,  NULL, rxBuffer, numOfWords, txDelay)
-
-//*****************************************************************************
-//
-//! This macro is used to receive 'N' 16-bits words of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param rxBuffer specifies receive buffer which will store the received bytes
-//! \param numOfWords specifies the number of 16-bit words to be received
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function is used to receive 'N' 16-bit words of data
-//! This function uses SPIpolling_FIFO_Transaction function.
-//! SPI character length is hardcoded to 16bits
-//!
-//! \return None.
-//
-//*****************************************************************************
-#define SPI_receiveN16BitWord(base, rxBuffer, numOfWords, txDelay)             \
-      SPI_pollingFIFOTransaction(base, 16U, NULL, rxBuffer, numOfWords, txDelay)
-
-//*****************************************************************************
-//
-//! This macro is used to receive 'N' words with specified character length
-//!
-//! \param base specifies the SPI module base address.
-//! \param charLength specifies the SPI character length of SPI transaction
-//! \param rxBuffer specifies receive buffer which will store the received bytes
-//! \param numOfWords specifies the number of words with specified character
-//!        length
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function is used to receive 'N' words with specified character length
-//! This function uses SPIpolling_FIFO_Transaction function.
-//! SPI character length is configurable using charLength variable
-//!
-//! \return None.
-//
-//*****************************************************************************
-#define SPI_receiveNWordsWithcharLength(base, charLength, rxBuffer,            \
-                                        numOfWords, txDelay)                   \
-            SPI_pollingFIFOTransaction(base, charLength, NULL, rxBuffer,       \
-                                       numOfWords, txDelay)
 
 //*****************************************************************************
 //
@@ -291,10 +108,10 @@ typedef enum
 //*****************************************************************************
 typedef enum
 {
-    SPI_MODE_PERIPHERAL     = 0x0002U,   //!< SPI peripheral
-    SPI_MODE_CONTROLLER     = 0x0006U,   //!< SPI controller
-    SPI_MODE_PERIPHERAL_OD  = 0x0000U,   //!< SPI peripheral w/ output disabled
-    SPI_MODE_CONTROLLER_OD  = 0x0004U    //!< SPI controller w/ output disabled
+    SPI_MODE_SLAVE     = 0x0002U,   //!< SPI slave
+    SPI_MODE_MASTER    = 0x0006U,   //!< SPI master
+    SPI_MODE_SLAVE_OD  = 0x0000U,   //!< SPI slave w/ output (TALK) disabled
+    SPI_MODE_MASTER_OD = 0x0004U    //!< SPI master w/ output (TALK) disabled
 } SPI_Mode;
 
 //*****************************************************************************
@@ -376,27 +193,15 @@ typedef enum
 
 //*****************************************************************************
 //
-//! Values that can be passed to SPI_setPTESignalPolarity() as the \e polarity
+//! Values that can be passed to SPI_setSTESignalPolarity() as the \e polarity
 //! parameter.
 //
 //*****************************************************************************
 typedef enum
 {
-    SPI_PTE_ACTIVE_LOW  = 0x0000U,        //!< SPIPTE is active low (normal)
-    SPI_PTE_ACTIVE_HIGH = SPI_PRI_PTEINV  //!< SPIPTE is active high (inverted)
-} SPI_PTEPolarity;
-
-//*****************************************************************************
-//
-//! Values that can be passed to SPI_receive16Bits(), SPI_receive24Bits(),
-//! SPI_receive32Bits()
-//
-//*****************************************************************************
-typedef enum
-{
-    SPI_DATA_LITTLE_ENDIAN   = 0U, //!< LITTLE ENDIAN
-    SPI_DATA_BIG_ENDIAN   = 1U,    //!< BIG ENDIAN
-} SPI_endianess;
+    SPI_STE_ACTIVE_LOW  = 0x0000U,        //!< SPISTE is active low (normal)
+    SPI_STE_ACTIVE_HIGH = SPI_PRI_STEINV  //!< SPISTE is active high (inverted)
+} SPI_STEPolarity;
 
 //*****************************************************************************
 //
@@ -473,31 +278,6 @@ SPI_disableModule(uint32_t base)
 
     HWREGH(base + SPI_O_CCR) &= ~(SPI_CCR_SPISWRESET);
 }
-
-//*****************************************************************************
-//
-//! Sets the character length of SPI transaction
-//!
-//! \param base specifies the SPI module base address.
-//! \param charLength specifies the character length of SPI transaction
-//!
-//! This function configures the character length of SPI transaction.
-//! SPI character length can be from anywhere between 1-bit word to 16 bit word
-//! of character length
-//!
-//! \return None.
-//
-//*****************************************************************************
-static inline void
-SPI_setcharLength(uint32_t base, uint16_t charLength)
-{
-    ASSERT((charLength >= 1U) && (charLength <= 16U));
-    SPI_disableModule(base);
-    HWREGH(base + SPI_O_CCR) = (HWREGH(base + SPI_O_CCR) & ~SPI_CCR_SPICHAR_M) |
-                               (charLength - 1U);
-    SPI_enableModule(base);
-}
-
 
 //*****************************************************************************
 //
@@ -992,10 +772,9 @@ SPI_readDataBlockingNonFIFO(uint32_t base)
 //!
 //! \param base is the base address of the SPI port.
 //!
-//! This function enables 3-wire mode. When in controller mode, this allows
-//! SPIPICO to become SPICOCI and SPIPOCI to become free for non-SPI use.
-//! When in peripheral mode, SPIPOCI because the SPIPIPO pin and SPIPICO is
-//! free for non-SPI use.
+//! This function enables 3-wire mode. When in master mode, this allows SPISIMO
+//! to become SPIMOMI and SPISOMI to become free for non-SPI use. When in slave
+//! mode, SPISOMI because the SPISISO pin and SPISIMO is free for non-SPI use.
 //!
 //! \return None.
 //
@@ -1045,9 +824,9 @@ SPI_disableTriWire(uint32_t base)
 //!
 //! \param base is the base address of the SPI port.
 //!
-//! This function enables loopback mode. This mode is only valid during
-//! controller mode and is helpful during device testing as it internally
-//! connects PICO and POCI.
+//! This function enables loopback mode. This mode is only valid during master
+//! mode and is helpful during device testing as it internally connects SIMO
+//! and SOMI.
 //!
 //! \return None.
 //
@@ -1094,24 +873,24 @@ SPI_disableLoopback(uint32_t base)
 
 //*****************************************************************************
 //
-//! Set the peripheral select (SPIPTE) signal polarity.
+//! Set the slave select (SPISTE) signal polarity.
 //!
 //! \param base is the base address of the SPI port.
-//! \param polarity is the SPIPTE signal polarity.
+//! \param polarity is the SPISTE signal polarity.
 //!
-//! This function sets the polarity of the peripheral select (SPIPTE) signal.
-//! The two modes to choose from for the \e polarity parameter are
-//! \b SPI_PTE_ACTIVE_LOW for active-low polarity (typical) and
-//! \b SPI_PTE_ACTIVE_HIGH for active-high polarity (considered inverted).
+//! This function sets the polarity of the slave select (SPISTE) signal. The
+//! two modes to choose from for the \e polarity parameter are
+//! \b SPI_STE_ACTIVE_LOW for active-low polarity (typical) and
+//! \b SPI_STE_ACTIVE_HIGH for active-high polarity (considered inverted).
 //!
-//! \note This has no effect on the PTE signal when in controller mode. It is
-//! only applicable to peripheral mode.
+//! \note This has no effect on the STE signal when in master mode. It is only
+//! applicable to slave mode.
 //!
 //! \return None.
 //
 //*****************************************************************************
 static inline void
-SPI_setPTESignalPolarity(uint32_t base, SPI_PTEPolarity polarity)
+SPI_setSTESignalPolarity(uint32_t base, SPI_STEPolarity polarity)
 {
     //
     // Check the arguments.
@@ -1119,9 +898,9 @@ SPI_setPTESignalPolarity(uint32_t base, SPI_PTEPolarity polarity)
     ASSERT(SPI_isBaseValid(base));
 
     //
-    // Write the polarity of the SPIPTE signal to the register.
+    // Write the polarity of the SPISTE signal to the register.
     //
-    HWREGH(base + SPI_O_PRI) = (HWREGH(base + SPI_O_PRI) & ~SPI_PRI_PTEINV) |
+    HWREGH(base + SPI_O_PRI) = (HWREGH(base + SPI_O_PRI) & ~SPI_PRI_STEINV) |
                                (uint16_t)polarity;
 }
 
@@ -1276,7 +1055,7 @@ SPI_readRxEmulationBuffer(uint32_t base)
 //!
 //! This function sets the TALK bit enabling the data trasnmission.
 //! This bit is enabled by SPI_setConfig if the parameter \r mode is selected as
-//! SPI_MODE_PERIPHERAL or SPI_MODE_CONTROLLER.
+//! SPI_MODE_SLAVE or SPI_MODE_MASTER.
 //!
 //! \return None
 //
@@ -1304,7 +1083,7 @@ SPI_enableTalk(uint32_t base)
 //! This function clears the TALK bit disabling the data trasnmission. The
 //! output pin will be put in high-impedance state.
 //! This bit is enabled by SPI_setConfig if the parameter \r mode is selected as
-//! SPI_MODE_PERIPHERAL or SPI_MODE_CONTROLLER.
+//! SPI_MODE_SLAVE or SPI_MODE_MASTER.
 //!
 //! \return None
 //
@@ -1321,32 +1100,6 @@ SPI_disableTalk(uint32_t base)
     // Set the TALK bit
     //
     HWREGH(base + SPI_O_CTL) &= ~SPI_CTL_TALK;
-}
-
-//*****************************************************************************
-//
-//! Reset SPI transmit and receive channels
-//!
-//! \param base is the base address of the SPI port.
-//!
-//! This function resets the SPI transmit and receive channels.
-//!
-//! \return None
-//
-//*****************************************************************************
-static inline void
-SPI_reset(uint32_t base)
-{
-    //
-    // Check the arguments.
-    //
-    ASSERT(SPI_isBaseValid(base));
-
-    //
-    // Write to SPRST bit the TX FIFO.
-    //
-    HWREGH(base + SPI_O_FFTX) &= ~SPI_FFTX_SPIRST;
-    HWREGH(base + SPI_O_FFTX) |= SPI_FFTX_SPIRST;
 }
 
 //*****************************************************************************
@@ -1379,11 +1132,11 @@ SPI_reset(uint32_t base)
 //! </pre>
 //!
 //! The \e mode parameter defines the operating mode of the SPI module.  The
-//! SPI module can operate as a controller or peripheral; the SPI can also be be
+//! SPI module can operate as a master or slave; the SPI can also be be
 //! configured to disable output on its serial output line.  The \e mode
-//! parameter can be one of the following values: \b SPI_MODE_CONTROLLER,
-//! \b SPI_MODE_PERIPHERAL, \b SPI_MODE_CONTROLLER_OD or
-//! \b SPI_MODE_PERIPHERAL_OD ("OD" indicates "output disabled").
+//! parameter can be one of the following values: \b SPI_MODE_MASTER,
+//! \b SPI_MODE_SLAVE, \b SPI_MODE_MASTER_OD or \b SPI_MODE_SLAVE_OD ("OD"
+//! indicates "output disabled").
 //!
 //! The \e bitRate parameter defines the bit rate for the SPI.  This bit rate
 //! must satisfy the following clock ratio criteria:
@@ -1540,159 +1293,6 @@ SPI_getInterruptStatus(uint32_t base);
 //*****************************************************************************
 extern void
 SPI_clearInterruptStatus(uint32_t base, uint32_t intFlags);
-
-
-//*****************************************************************************
-//
-//! This function can be used to transmit a 24-bit word of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param txData is the data to be transmitted over SPI
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function can be used to transmit a 24-bit word of data.
-//! 24-bit word data is divided into three bytes of data.
-//!
-//! This function uses SPI_pollingFIFOTransaction function.
-//! SPI character length is hardcoded to 8 (8bits) of character length
-//!
-//! \return None.
-//
-//*****************************************************************************
-extern void
-SPI_transmit24Bits(uint32_t base, uint32_t data, uint16_t txDelay);
-
-//*****************************************************************************
-//
-//! This function can be used to transmit a 32-bit word of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param txData is the data to be transmitted over SPI
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function can be used to transmit a 32-bit word of data.
-//! 32-bit word data is divided into four bytes of data.
-//!
-//! This function uses SPI_pollingFIFOTransaction function.
-//! SPI character length is hardcoded to 8 (8bits) of character length
-//!
-//! \return None.
-//
-//*****************************************************************************
-extern void
-SPI_transmit32Bits(uint32_t base, uint32_t data, uint16_t txDelay);
-
-
-
-//*****************************************************************************
-//
-//! This function is used to receive a 16-bit word of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param endianness specifies the endianess of received data
-//! \param dummyData is the data which is transmitted to initiate
-//!        SPI transaction to receive SPI data
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function is used to receive a 16-bit word of data.
-//! This function uses SPIpolling_FIFO_Transaction function.
-//! SPI character length is hardcoded to 8 (1 byte = 8 bits)of character length
-//!
-//! \return the received 16-bit word.
-//
-//*****************************************************************************
-extern uint16_t
-SPI_receive16Bits(uint32_t base, SPI_endianess endianness, uint16_t dummyData,
-                  uint16_t txDelay);
-
-//*****************************************************************************
-//
-//! This function is used to receive a 24-bit word of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param endianness specifies the endianess of received data
-//! \param dummyData is the data which is transmitted to initiate
-//!        SPI transaction to receive SPI data
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function is used to receive a 24-bit word of data.
-//! This function uses SPIpolling_FIFO_Transaction function.
-//! SPI character length is hardcoded to 8 (1 byte = 8 bits)of character length
-//!
-//! \return the received 24-bit word.
-//
-//*****************************************************************************
-extern uint32_t
-SPI_receive24Bits(uint32_t base, SPI_endianess endianness, uint16_t dummyData,
-                  uint16_t txDelay);
-
-//*****************************************************************************
-//
-//! This function is used to receive a 32-bit word of data
-//!
-//! \param base specifies the SPI module base address.
-//! \param endianness specifies the endianess of received data
-//! \param dummyData is the data which is transmitted to initiate
-//!        SPI transaction to receive SPI data
-//! \param txDelay specifies the number of serial clock cycles delay time after
-//!        completion of perious word
-//!
-//! This function is used to receive a 32-bit word of data.
-//! This function uses SPIpolling_FIFO_Transaction function.
-//! SPI character length is hardcoded to 8 (1 byte = 8 bits)of character length
-//!
-//! \return the received 32-bit word.
-//
-//*****************************************************************************
-extern uint32_t
-SPI_receive32Bits(uint32_t base, SPI_endianess endianness, uint16_t dummyData,
-                  uint16_t txDelay);
-
-
-
-//*****************************************************************************
-//
-//! This function is used to initiate SPI transaction of specified character
-//! length
-//!
-//! \param base specifies the SPI module base address.
-//! \param charLength specifies the SPI character length of SPI transaction
-//! \param data specified the data to be transmitted
-//!
-//! This function is used to initiate SPI transaction of specified character.
-//! SPI character length is configurable using charLength variable
-//!
-//! \return .
-//
-//*****************************************************************************
-extern uint16_t
-SPI_pollingNonFIFOTransaction(uint32_t base, uint16_t charLength,
-                              uint16_t data);
-
-//*****************************************************************************
-//
-//! This function is used to initiate SPI transaction of specified character
-//! length and 'N' words of transaction
-//!
-//! \param base specifies the SPI module base address.
-//! \param charLength specifies the SPI character length of SPI transaction
-//! \param pTxBuffer specifies the pointer to transmit buffer
-//! \param pRxBuffer specifies the pointer to receive buffer
-//! \param numOfWords specified the number of data to be transmitted / received
-//!
-//! SPI character length is configurable using charLength variable
-//!
-//! \return none
-//
-//*****************************************************************************
-extern void
-SPI_pollingFIFOTransaction(uint32_t base, uint16_t charLength,
-                           uint16_t *pTxBuffer, uint16_t *pRxBuffer,
-                           uint16_t numOfWords, uint16_t txDelay);
 
 //*****************************************************************************
 //

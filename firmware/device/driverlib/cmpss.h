@@ -5,8 +5,10 @@
 // TITLE:  C28x CMPSS driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -180,33 +182,13 @@ extern "C"
 
 //*****************************************************************************
 //
-// Values that can be passed to CMPSS_configRamp()
-// as the pwmSyncSrc parameter.
-//
-//*****************************************************************************
-#define CMPSS_PWMSYNC1  1U //!< PWMSYNC1
-#define CMPSS_PWMSYNC2  2U //!< PWMSYNC2
-#define CMPSS_PWMSYNC3  3U //!< PWMSYNC3
-#define CMPSS_PWMSYNC4  4U //!< PWMSYNC4
-#define CMPSS_PWMSYNC5  5U //!< PWMSYNC5
-#define CMPSS_PWMSYNC6  6U //!< PWMSYNC6
-#define CMPSS_PWMSYNC7  7U //!< PWMSYNC7
-#define CMPSS_PWMSYNC8  8U //!< PWMSYNC8
-#define CMPSS_PWMSYNC9  9U //!< PWMSYNC9
-#define CMPSS_PWMSYNC10  10U //!< PWMSYNC10
-#define CMPSS_PWMSYNC11  11U //!< PWMSYNC11
-#define CMPSS_PWMSYNC12  12U //!< PWMSYNC12
-
-
-//*****************************************************************************
-//
 // Prototypes for the APIs.
 //
 //*****************************************************************************
 //*****************************************************************************
 //
 //! \internal
-//! Checks the CMPSS base address.
+//! Checks a CMPSS base address.
 //!
 //! \param base is the base address of the CMPSS module.
 //!
@@ -220,7 +202,7 @@ extern "C"
 static inline bool
 CMPSS_isBaseValid(uint32_t base)
 {
-    return(
+	return(
            (base == CMPSS1_BASE) ||
            (base == CMPSS2_BASE) ||
            (base == CMPSS3_BASE) ||
@@ -229,7 +211,7 @@ CMPSS_isBaseValid(uint32_t base)
            (base == CMPSS6_BASE) ||
            (base == CMPSS7_BASE) ||
            (base == CMPSS8_BASE)
-          );
+		  );
 }
 #endif
 
@@ -426,7 +408,7 @@ CMPSS_configOutputsHigh(uint32_t base, uint16_t config)
 
     HWREGH(base + CMPSS_O_COMPCTL) = (HWREGH(base + CMPSS_O_COMPCTL) &
                                       ~(CMPSS_COMPCTL_CTRIPOUTHSEL_M |
-                                        CMPSS_COMPCTL_CTRIPHSEL_M))  |
+                                        CMPSS_COMPCTL_CTRIPHSEL_M)) |
                                      config;
 
     EDIS;
@@ -560,9 +542,9 @@ CMPSS_configDAC(uint32_t base, uint16_t config)
     EALLOW;
 
     HWREGH(base + CMPSS_O_COMPDACCTL) =
-                    (HWREGH(base + CMPSS_O_COMPDACCTL) &
-                     ~(CMPSS_COMPDACCTL_SWLOADSEL | CMPSS_COMPDACCTL_SELREF |
-                       CMPSS_COMPDACCTL_DACSOURCE)) | config;
+        (HWREGH(base + CMPSS_O_COMPDACCTL) &
+         ~(CMPSS_COMPDACCTL_SWLOADSEL | CMPSS_COMPDACCTL_SELREF |
+           CMPSS_COMPDACCTL_DACSOURCE)) | config;
 
     EDIS;
 }
@@ -1003,7 +985,7 @@ CMPSS_setHysteresis(uint32_t base, uint16_t value)
 //!
 //! \param base is the base address of the comparator module.
 //!
-//! This function enables EPWMSYNCPER reset of High comparator digital filter
+//! This function enables EPWMSYNCPER reset of High comparator digital filter 
 //! output latch
 //!
 //! \return None.
@@ -1016,11 +998,11 @@ CMPSS_enableLatchResetOnPWMSYNCHigh(uint32_t base)
     // Check the arguments.
     //
     ASSERT(CMPSS_isBaseValid(base));
-
+    
     EALLOW;
-
+    
     HWREGH(base + CMPSS_O_COMPSTSCLR) |= CMPSS_COMPSTSCLR_HSYNCCLREN;
-
+    
     EDIS;
 }
 
@@ -1030,7 +1012,7 @@ CMPSS_enableLatchResetOnPWMSYNCHigh(uint32_t base)
 //!
 //! \param base is the base address of the comparator module.
 //!
-//! This function disables EPWMSYNCPER reset of High comparator digital filter
+//! This function disables EPWMSYNCPER reset of High comparator digital filter 
 //! output latch
 //!
 //! \return None.
@@ -1043,11 +1025,11 @@ CMPSS_disableLatchResetOnPWMSYNCHigh(uint32_t base)
     // Check the arguments.
     //
     ASSERT(CMPSS_isBaseValid(base));
-
+    
     EALLOW;
-
+    
     HWREGH(base + CMPSS_O_COMPSTSCLR) &= ~CMPSS_COMPSTSCLR_HSYNCCLREN;
-
+    
     EDIS;
 }
 
@@ -1057,7 +1039,7 @@ CMPSS_disableLatchResetOnPWMSYNCHigh(uint32_t base)
 //!
 //! \param base is the base address of the comparator module.
 //!
-//! This function enables EPWMSYNCPER reset of Low comparator digital filter
+//! This function enables EPWMSYNCPER reset of Low comparator digital filter 
 //! output latch
 //!
 //! \return None.
@@ -1070,11 +1052,11 @@ CMPSS_enableLatchResetOnPWMSYNCLow(uint32_t base)
     // Check the arguments.
     //
     ASSERT(CMPSS_isBaseValid(base));
-
+    
     EALLOW;
-
+    
     HWREGH(base + CMPSS_O_COMPSTSCLR) |= CMPSS_COMPSTSCLR_LSYNCCLREN;
-
+    
     EDIS;
 }
 
@@ -1084,7 +1066,7 @@ CMPSS_enableLatchResetOnPWMSYNCLow(uint32_t base)
 //!
 //! \param base is the base address of the comparator module.
 //!
-//! This function disables EPWMSYNCPER reset of Low comparator digital filter
+//! This function disables EPWMSYNCPER reset of Low comparator digital filter 
 //! output latch
 //!
 //! \return None.
@@ -1097,11 +1079,11 @@ CMPSS_disableLatchResetOnPWMSYNCLow(uint32_t base)
     // Check the arguments.
     //
     ASSERT(CMPSS_isBaseValid(base));
-
+    
     EALLOW;
-
+    
     HWREGH(base + CMPSS_O_COMPSTSCLR) &= ~CMPSS_COMPSTSCLR_LSYNCCLREN;
-
+    
     EDIS;
 }
 
@@ -1118,9 +1100,10 @@ CMPSS_disableLatchResetOnPWMSYNCLow(uint32_t base)
 //! comparator.
 //!
 //! The \e samplePrescale parameter specifies the number of system clock cycles
-//! not be passed as this parameter. The prescaler used by digital filter is 1
+//! between samples. It is a 10-bit value so a number higher than 1023 should
+//! not be passed as this parameter. The prescale used by digital filter is 1
 //! more than \e samplePrescale value. So, the input provided should be 1 less
-//! than the expected prescaler.
+//! than the expected prescale.
 //!
 //! The \e sampleWindow parameter configures the size of the window of FIFO
 //! samples taken from the input that will be monitored to determine when to
@@ -1165,9 +1148,10 @@ CMPSS_configFilterHigh(uint32_t base, uint16_t samplePrescale,
 //! comparator.
 //!
 //! The \e samplePrescale parameter specifies the number of system clock cycles
-//! not be passed as this parameter. The prescaler used by digital filter is 1
+//! between samples. It is a 10-bit value so a number higher than 1023 should
+//! not be passed as this parameter. The prescale used by digital filter is 1
 //! more than \e samplePrescale value. So, the input provided should be 1 less
-//! than the expected prescaler.
+//! than the expected prescale.
 //!
 //! The \e sampleWindow parameter configures the size of the window of FIFO
 //! samples taken from the input that will be monitored to determine when to
@@ -1246,7 +1230,7 @@ CMPSS_configLatchOnPWMSYNC(uint32_t base, bool highEnable, bool lowEnable);
 //!
 //! The number of the PWMSYNC signal to be used to reset the ramp generator
 //! should be specified by passing it into the \e pwmSyncSrc parameter. For
-//! instance, passing a CMPSS_PWMSYNCx into \e pwmSyncSrc will select PWMSYNCx.
+//! instance, passing a 2 into \e pwmSyncSrc will select PWMSYNC2.
 //!
 //! To indicate whether the ramp generator should reset with the value from the
 //! ramp max reference value shadow register or with the latched ramp max
@@ -1261,7 +1245,6 @@ CMPSS_configLatchOnPWMSYNC(uint32_t base, bool highEnable, bool lowEnable);
 extern void
 CMPSS_configRamp(uint32_t base, uint16_t maxRampVal, uint16_t decrementVal,
                  uint16_t delayVal, uint16_t pwmSyncSrc, bool useRampValShdw);
-
 
 //*****************************************************************************
 //

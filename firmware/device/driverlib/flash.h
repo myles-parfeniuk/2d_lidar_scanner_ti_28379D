@@ -5,8 +5,10 @@
 // TITLE:  C28x Flash driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -77,7 +79,6 @@ extern "C"
 #pragma CODE_SECTION(Flash_enablePrefetch, ".TI.ramfunc");
 #pragma CODE_SECTION(Flash_enableECC, ".TI.ramfunc");
 #endif
-
 
 //*****************************************************************************
 //
@@ -836,7 +837,6 @@ Flash_getUncorrectableErrorAddressHigh(uint32_t eccBase)
 static inline Flash_ErrorStatus
 Flash_getLowErrorStatus(uint32_t eccBase)
 {
-    uint32_t errorStatus;
     //
     // Check the arguments.
     //
@@ -845,8 +845,8 @@ Flash_getLowErrorStatus(uint32_t eccBase)
     //
     // Get the Low Error Status bits
     //
-    errorStatus = (HWREG(eccBase + FLASH_O_ERR_STATUS) & 0x7UL);
-    return((Flash_ErrorStatus)errorStatus);
+    return((Flash_ErrorStatus)(HWREG(eccBase + FLASH_O_ERR_STATUS) &
+            (uint32_t)0x7U));
 }
 
 //*****************************************************************************
@@ -865,7 +865,6 @@ Flash_getLowErrorStatus(uint32_t eccBase)
 static inline Flash_ErrorStatus
 Flash_getHighErrorStatus(uint32_t eccBase)
 {
-    uint32_t errorStatus;
     //
     // Check the arguments.
     //
@@ -874,8 +873,8 @@ Flash_getHighErrorStatus(uint32_t eccBase)
     //
     // Get the High Error Status bits
     //
-    errorStatus = ((HWREG(eccBase + FLASH_O_ERR_STATUS) >> 16U) & 0x7UL);
-    return((Flash_ErrorStatus)errorStatus);
+    return((Flash_ErrorStatus)((HWREG(eccBase + FLASH_O_ERR_STATUS) >>
+            16U) & (uint32_t)0x7U));
 }
 
 //*****************************************************************************
@@ -957,13 +956,9 @@ Flash_getLowErrorType(uint32_t eccBase)
     //
     if((HWREG(eccBase + FLASH_O_ERR_POS) & FLASH_ERR_POS_ERR_TYPE_L)
                                 == FLASH_ERR_POS_ERR_TYPE_L)
-    {
         errorType =  FLASH_ECC_ERR;
-    }
     else
-    {
         errorType =  FLASH_DATA_ERR;
-    }
 
     return(errorType);
 }
@@ -995,13 +990,9 @@ Flash_getHighErrorType(uint32_t eccBase)
     //
     if((HWREG(eccBase + FLASH_O_ERR_POS) & FLASH_ERR_POS_ERR_TYPE_H)
                                 == FLASH_ERR_POS_ERR_TYPE_H)
-    {
         errorType =  FLASH_ECC_ERR;
-    }
     else
-    {
         errorType =  FLASH_DATA_ERR;
-    }
 
     return(errorType);
 }
@@ -1632,20 +1623,6 @@ Flash_initModule(uint32_t ctrlBase, uint32_t eccBase, uint16_t waitstates);
 extern void
 Flash_powerDown(uint32_t ctrlBase);
 
-//*****************************************************************************
-//
-//! Wakes the flash from low power mode.
-//!
-//! \param ctrlBase is the base address of the flash wrapper control registers.
-//!
-//! This function will power up Flash bank and pump and set the
-//! fallback mode of flash and pump as active.
-//!
-//! \return None.
-//
-//*****************************************************************************
-extern void
-Flash_wakeFromLPM(uint32_t ctrlBase);
 
 //*****************************************************************************
 //

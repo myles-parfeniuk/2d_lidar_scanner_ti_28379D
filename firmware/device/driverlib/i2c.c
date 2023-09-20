@@ -5,8 +5,10 @@
 // TITLE:  C28x I2C driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -44,12 +46,12 @@
 
 //*****************************************************************************
 //
-// I2C_initController
+// I2C_initMaster
 //
 //*****************************************************************************
 void
-I2C_initController(uint32_t base, uint32_t sysclkHz, uint32_t bitRate,
-                   I2C_DutyCycle dutyCycle)
+I2C_initMaster(uint32_t base, uint32_t sysclkHz, uint32_t bitRate,
+               I2C_DutyCycle dutyCycle)
 {
     uint32_t modPrescale;
     uint32_t divider;
@@ -118,12 +120,12 @@ I2C_enableInterrupt(uint32_t base, uint32_t intFlags)
     HWREGH(base + I2C_O_IER) |= (intFlags & 0x00FFU);
 
     //
-    // Enabling addressed-as-target interrupt separately because its bit is
+    // Enabling addressed-as-slave interrupt separately because its bit is
     // different between the IER and STR registers.
     //
-    if((intFlags & I2C_INT_ADDR_TARGET) != 0U)
+    if((intFlags & I2C_INT_ADDR_SLAVE) != 0U)
     {
-        HWREGH(base + I2C_O_IER) |= I2C_IER_AAT;
+        HWREGH(base + I2C_O_IER) |= I2C_IER_AAS;
     }
 
     //
@@ -159,12 +161,12 @@ I2C_disableInterrupt(uint32_t base, uint32_t intFlags)
     HWREGH(base + I2C_O_IER) &= ~(intFlags & 0x00FFU);
 
     //
-    // Disabling addressed-as-target interrupt separately because its bit is
+    // Disabling addressed-as-slave interrupt separately because its bit is
     // different between the IER and STR registers.
     //
-    if((intFlags & I2C_INT_ADDR_TARGET) != 0U)
+    if((intFlags & I2C_INT_ADDR_SLAVE) != 0U)
     {
-        HWREGH(base + I2C_O_IER) &= ~I2C_IER_AAT;
+        HWREGH(base + I2C_O_IER) &= ~I2C_IER_AAS;
     }
 
     //
@@ -247,25 +249,4 @@ I2C_clearInterruptStatus(uint32_t base, uint32_t intFlags)
     {
         HWREGH(base + I2C_O_FFRX) |= I2C_FFRX_RXFFINTCLR;
     }
-}
-//*****************************************************************************
-//
-// I2C_configureModuleFrequency
-//
-//*****************************************************************************
-void
-I2C_configureModuleFrequency(uint32_t base, uint32_t sysclkHz)
-{
-    uint32_t modPrescale;
-
-    //
-    // Check the arguments.
-    //
-    ASSERT(I2C_isBaseValid(base));
-
-    //
-    // Set the prescaler for the module clock.
-    //
-    modPrescale = (sysclkHz / 10000000U) - 1U;
-    HWREGH(base + I2C_O_PSC) = I2C_PSC_IPSC_M & modPrescale;
 }

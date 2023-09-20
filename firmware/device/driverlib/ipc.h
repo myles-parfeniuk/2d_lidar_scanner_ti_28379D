@@ -2,11 +2,12 @@
 //
 // FILE:   ipc.h
 //
-// TITLE:  C28x IPC driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -172,7 +173,6 @@ extern "C"
 #define IPC_NONBLOCKING_CALL  false
 
 
-
 //*****************************************************************************
 //
 // Internal macros used for message queue implementation
@@ -194,8 +194,6 @@ extern "C"
 //*****************************************************************************
 typedef enum
 {
-    IPC_CPU1_L_CPU2_R,       //!< CPU1 - Local core, CPU2 - Remote core
-    IPC_CPU2_L_CPU1_R,       //!< CPU2 - Local core, CPU1 - Remote core
     IPC_TOTAL_NUM
 }IPC_Type_t;
 
@@ -236,6 +234,7 @@ typedef struct
 {
     uint32_t IPC_BOOTSTS;
     uint32_t IPC_BOOTMODE;
+    uint32_t IPC_PUMPREQUEST;
 }IPC_Boot_Pump_Reg_t;
 
 #if IPC_MSGQ_SUPPORT == 1U
@@ -485,23 +484,6 @@ IPC_sync(IPC_Type_t ipcType, uint32_t flag)
 
 //*****************************************************************************
 //
-//! Initialize IPC
-//!
-//! \param ipcType is the enum corresponding to the IPC instance used
-//
-//! This function initializes IPC by clearing all the flags
-//!
-//! \return None
-//
-//*****************************************************************************
-static inline void
-IPC_init(IPC_Type_t ipcType)
-{
-    IPC_clearFlagLtoR(ipcType, IPC_FLAG_ALL);
-}
-
-//*****************************************************************************
-//
 //! Sends a command to the Remote core
 //!
 //! \param ipcType is the enum corresponding to the IPC instance used
@@ -619,27 +601,6 @@ IPC_getResponse(IPC_Type_t ipcType)
     return(IPC_Instance[ipcType].IPC_SendCmd_Reg->IPC_REMOTEREPLY);
 }
 
-//*****************************************************************************
-//
-//! Sets the BOOTMODE register.
-//!
-//! \param ipcType is the enum corresponding to the IPC instance used
-//! \param mode is the 32-bit value to be set
-//!
-//! Allows the caller to set the BOOTMODE register.
-//!
-//! \note This function shall be called by CPU1 only.
-//!
-//! \return None
-//
-//*****************************************************************************
-static inline void
-IPC_setBootMode(IPC_Type_t ipcType, uint32_t mode)
-{
-    ASSERT(ipcType == IPC_CPU1_L_CPU2_R);
-
-    IPC_Instance[ipcType].IPC_Boot_Pump_Reg->IPC_BOOTMODE = mode;
-}
 
 //*****************************************************************************
 //
@@ -670,7 +631,6 @@ IPC_getBootMode(IPC_Type_t ipcType)
 //!
 //! \note This function shall be called by CPU2 and CM only
 //!
-//! \note This function shall be called by CPU2 only.
 //!
 //! \return None.
 //
@@ -678,7 +638,6 @@ IPC_getBootMode(IPC_Type_t ipcType)
 static inline void
 IPC_setBootStatus(IPC_Type_t ipcType, uint32_t status)
 {
-    ASSERT(ipcType == IPC_CPU2_L_CPU1_R);
 
     IPC_Instance[ipcType].IPC_Boot_Pump_Reg->IPC_BOOTSTS = status;
 }

@@ -5,8 +5,10 @@
 // TITLE:  Assert definition macro for debug.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -48,7 +50,7 @@
 // application's responsibility to define the __error__ function.
 //
 //*****************************************************************************
-extern void __error__(const char *filename, uint32_t line);
+extern void __error__(char *filename, uint32_t line);
 
 //*****************************************************************************
 //
@@ -57,10 +59,6 @@ extern void __error__(const char *filename, uint32_t line);
 //
 //*****************************************************************************
 #ifdef DEBUG
-#ifdef __TMS320C28XX__
-//
-// When called from C28x application
-//
 #define ASSERT(expr) do                                                       \
                      {                                                        \
                          if(!(expr))                                          \
@@ -68,20 +66,7 @@ extern void __error__(const char *filename, uint32_t line);
                              __error__(__FILE__, __LINE__);                   \
                          }                                                    \
                      }                                                        \
-                     while((_Bool)0)
-#else
-//
-// When called from CLA application. Update as needed.
-//
-#define ASSERT(expr) do                                                       \
-                     {                                                        \
-                         if(!(expr))                                          \
-                         {                                                    \
-                             __mdebugstop();                                  \
-                         }                                                    \
-                     }                                                        \
-                     while((_Bool)0)
-#endif
+                     while(0)
 #else
 #define ASSERT(expr)
 #endif

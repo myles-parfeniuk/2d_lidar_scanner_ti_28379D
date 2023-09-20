@@ -2,8 +2,7 @@
   <project
         name="f2837xd_driverlib"
         device="Generic C28xx Device"
-        cgtVersion="22.6.0.LTS"
-        products="c2000ware_software_package"
+        cgtVersion="20.2.1.LTS"
         launchWizard="False"
         outputType="staticLibrary"
         location="."
@@ -30,7 +29,6 @@
     <file action="link"  path="../gpio.c"  targetDirectory="." />
     <file action="link"  path="../hrpwm.c"  targetDirectory="." />
     <file action="link"  path="../i2c.c"  targetDirectory="." />
-    <file action="link"  path="../ipc.c"  targetDirectory="." />
     <file action="link"  path="../interrupt.c"  targetDirectory="." />
     <file action="link"  path="../mcbsp.c"  targetDirectory="." />
     <file action="link"  path="../memcfg.c"  targetDirectory="." />

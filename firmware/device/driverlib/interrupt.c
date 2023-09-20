@@ -5,8 +5,10 @@
 // TITLE:  C28x Interrupt (PIE) driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -107,7 +109,7 @@ static void Interrupt_clearIFR(uint16_t group)
             //
             // Invalid group mask.
             //
-            ASSERT((bool)false);
+            ASSERT(false);
             break;
     }
 }
@@ -123,7 +125,7 @@ Interrupt_initModule(void)
     //
     // Disable and clear all interrupts at the CPU
     //
-    (void)Interrupt_disableGlobal();
+    (void)Interrupt_disableMaster();
     IER = 0x0000U;
     IFR = 0x0000U;
 
@@ -168,87 +170,6 @@ Interrupt_initModule(void)
 
 //*****************************************************************************
 //
-//! The default interrupt handler.
-//!
-//! \return None.
-//
-//*****************************************************************************
-__interrupt void Interrupt_defaultHandler(void)
-{
-    uint16_t pieVect;
-    uint16_t vectID;
-
-    //
-    // Calculate the vector ID. If the vector is in the lower PIE, it's the
-    // offset of the vector that was fetched (bits 7:1 of PIECTRL.PIEVECT)
-    // divided by two.
-    //
-    pieVect = HWREGH(PIECTRL_BASE + PIE_O_CTRL);
-    vectID = (pieVect & 0xFEU) >> 1U;
-
-    //
-    // If the vector is in the upper PIE, the vector ID is 128 or higher.
-    //
-    if(pieVect >= 0x0E00U)
-    {
-        vectID += 128U;
-    }
-
-    //
-    // Something has gone wrong. An interrupt without a proper registered
-    // handler function has occurred. To help you debug the issue, local
-    // variable vectID contains the vector ID of the interrupt that occurred.
-    //
-    ESTOP0;
-    for(;;)
-    {
-        ;
-    }
-}
-
-//*****************************************************************************
-//
-//! The default illegal instruction trap interrupt handler.
-//!
-//! \return None.
-//
-//*****************************************************************************
-__interrupt void Interrupt_illegalOperationHandler(void)
-{
-    //
-    // Something has gone wrong.  The CPU has tried to execute an illegal
-    // instruction, generating an illegal instruction trap (ITRAP).
-    //
-    ESTOP0;
-    for(;;)
-    {
-        ;
-    }
-}
-
-//*****************************************************************************
-//
-//! The default non-maskable interrupt handler.
-//!
-//! \return None.
-//
-//*****************************************************************************
-__interrupt void Interrupt_nmiHandler(void)
-{
-    //
-    // A non-maskable interrupt has occurred, indicating that a hardware error
-    // has occurred in the system.  You can use SysCtl_getNMIFlagStatus() to
-    // to read the NMIFLG register and determine what caused the NMI.
-    //
-    ESTOP0;
-    for(;;)
-    {
-        ;
-    }
-}
-
-//*****************************************************************************
-//
 // Interrupt_initVectorTable
 //
 //*****************************************************************************
@@ -272,9 +193,9 @@ Interrupt_initVectorTable(void)
     //
     // NMI and ITRAP get their own handlers.
     //
-    HWREG(PIEVECTTABLE_BASE + ((INT_NMI >> 16U) * 2U)) =
+    HWREG((uint32_t)PIEVECTTABLE_BASE + ((INT_NMI >> 16U) * 2U)) =
         (uint32_t)Interrupt_nmiHandler;
-    HWREG(PIEVECTTABLE_BASE + ((INT_ILLEGAL >> 16U) * 2U)) =
+    HWREG((uint32_t)PIEVECTTABLE_BASE + ((INT_ILLEGAL >> 16U) * 2U)) =
         (uint32_t)Interrupt_illegalOperationHandler;
 
     EDIS;
@@ -298,18 +219,18 @@ Interrupt_enable(uint32_t interruptNumber)
     //
     // Globally disable interrupts but save status
     //
-    intsDisabled = Interrupt_disableGlobal();
+    intsDisabled = Interrupt_disableMaster();
 
     //
     // PIE Interrupts
     //
     if(vectID >= 0x20U)
     {
-        intGroup = (uint16_t)(((interruptNumber & 0xFF00UL) >> 8U) - 1U);
-        groupMask = (uint16_t)1U << intGroup;
+        intGroup = ((uint16_t)(interruptNumber & 0xFF00U) >> 8U) - 1U;
+        groupMask = 1U << intGroup;
 
-        HWREGH((PIECTRL_BASE + PIE_O_IER1 + (intGroup * 2U))) |=
-            (uint16_t)1U << ((interruptNumber & 0xFFU) - 1U);
+        HWREGH(PIECTRL_BASE + PIE_O_IER1 + (intGroup * 2U)) |=
+            1U << ((uint16_t)(interruptNumber & 0xFFU) - 1U);
 
         //
         // Enable PIE Group Interrupt
@@ -336,7 +257,7 @@ Interrupt_enable(uint32_t interruptNumber)
     //
     if(!intsDisabled)
     {
-        (void)Interrupt_enableGlobal();
+        (void)Interrupt_enableMaster();
     }
 }
 
@@ -355,21 +276,21 @@ Interrupt_disable(uint32_t interruptNumber)
 
     vectID = (uint16_t)(interruptNumber >> 16U);
 
-    intsDisabled = Interrupt_disableGlobal();
+    intsDisabled = Interrupt_disableMaster();
 
     //
     // PIE Interrupts
     //
     if(vectID >= 0x20U)
     {
-        intGroup = (uint16_t)(((interruptNumber & 0xFF00UL) >> 8U) - 1U);
-        groupMask = (uint16_t)1U << intGroup;
+        intGroup = ((uint16_t)(interruptNumber & 0xFF00U) >> 8U) - 1U;
+        groupMask = 1U << intGroup;
 
         //
         // Disable individual PIE interrupt
         //
-        HWREGH((PIECTRL_BASE + PIE_O_IER1 + (intGroup * 2U))) &=
-            ~(1U << ((interruptNumber & 0xFFUL) - 1U));
+        HWREGH(PIECTRL_BASE + PIE_O_IER1 + (intGroup * 2U)) &=
+            ~(1U << ((uint16_t)(interruptNumber & 0xFFU) - 1U));
 
         //
         // Wait for any pending interrupts to get to the CPU
@@ -393,7 +314,7 @@ Interrupt_disable(uint32_t interruptNumber)
     //
     else if((vectID >= 0x0DU) && (vectID <= 0x10U))
     {
-        IER &= ~((uint16_t)1U << (vectID - 1U));
+        IER &= ~(1U << (vectID - 1U));
 
         //
         // Wait for any pending interrupts to get to the CPU
@@ -404,7 +325,7 @@ Interrupt_disable(uint32_t interruptNumber)
         NOP;
         NOP;
 
-        Interrupt_clearIFR((uint16_t)1U << (vectID - 1U));
+        Interrupt_clearIFR(1U << (vectID - 1U));
     }
     else
     {
@@ -418,6 +339,6 @@ Interrupt_disable(uint32_t interruptNumber)
     //
     if(!intsDisabled)
     {
-        (void)Interrupt_enableGlobal();
+        (void)Interrupt_enableMaster();
     }
 }

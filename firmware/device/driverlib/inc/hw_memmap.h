@@ -5,8 +5,10 @@
 // TITLE:   Macros defining the memory map of the C28x.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -154,24 +156,26 @@
 #define LS3_RAM_BASE              0x00009800U
 #define LS4_RAM_BASE              0x0000A000U
 #define LS5_RAM_BASE              0x0000A800U
-#define D0_RAM_BASE               0x0000B000U
-#define D1_RAM_BASE               0x0000B800U
-#define GS0_RAM_BASE              0x0000C000U
-#define GS1_RAM_BASE              0x0000D000U
-#define GS2_RAM_BASE              0x0000E000U
-#define GS3_RAM_BASE              0x0000F000U
-#define GS4_RAM_BASE              0x00010000U
-#define GS5_RAM_BASE              0x00011000U
-#define GS6_RAM_BASE              0x00012000U
-#define GS7_RAM_BASE              0x00013000U
-#define GS8_RAM_BASE              0x00014000U
-#define GS9_RAM_BASE              0x00015000U
-#define GS10_RAM_BASE             0x00016000U
-#define GS11_RAM_BASE             0x00017000U
-#define GS12_RAM_BASE             0x00018000U
-#define GS13_RAM_BASE             0x00019000U
-#define GS14_RAM_BASE             0x0001A000U
-#define GS15_RAM_BASE             0x0001B000U
+#define LS6_RAM_BASE              0x0000B000U
+#define LS7_RAM_BASE              0x0000B800U
+#define D0_RAM_BASE               0x0000C000U
+#define D1_RAM_BASE               0x0000C800U
+#define GS0_RAM_BASE              0x0000D000U
+#define GS1_RAM_BASE              0x0000E000U
+#define GS2_RAM_BASE              0x0000F000U
+#define GS3_RAM_BASE              0x00010000U
+#define GS4_RAM_BASE              0x00011000U
+#define GS5_RAM_BASE              0x00012000U
+#define GS6_RAM_BASE              0x00013000U
+#define GS7_RAM_BASE              0x00014000U
+#define GS8_RAM_BASE              0x00015000U
+#define GS9_RAM_BASE              0x00016000U
+#define GS10_RAM_BASE             0x00017000U
+#define GS11_RAM_BASE             0x00018000U
+#define GS12_RAM_BASE             0x00019000U
+#define GS13_RAM_BASE             0x0001A000U
+#define GS14_RAM_BASE             0x0001B000U
+#define GS15_RAM_BASE             0x0001C000U
 #define CPU2_TO_CPU1_MSG_RAM_BASE 0x0003F800U
 #define CPU1_TO_CPU2_MSG_RAM_BASE 0x0003FC00U
 #define USBA_BASE                 0x00040000U

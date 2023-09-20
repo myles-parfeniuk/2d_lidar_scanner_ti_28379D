@@ -5,8 +5,10 @@
 // TITLE:   C28x SDFM Driver
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -205,9 +207,9 @@ typedef enum
 // Values that can be passed to SDFM_clearInterruptFlag flags parameter
 //
 //*****************************************************************************
-//! Main interrupt flag
+//! Master interrupt flag
 //!
-#define SDFM_MAIN_INTERRUPT_FLAG           0x80000000U
+#define SDFM_MASTER_INTERRUPT_FLAG         0x80000000U
 //! Filter 1 high -level threshold flag
 //!
 #define SDFM_FILTER_1_HIGH_THRESHOLD_FLAG  0x1U
@@ -944,7 +946,7 @@ SDFM_getIsrStatus(uint32_t base)
 //!
 //! This function clears the specified pending interrupt flag.
 //! Valid values are
-//! SDFM_MAIN_INTERRUPT_FLAG,SDFM_FILTER_1_NEW_DATA_FLAG,
+//! SDFM_MASTER_INTERRUPT_FLAG,SDFM_FILTER_1_NEW_DATA_FLAG,
 //! SDFM_FILTER_2_NEW_DATA_FLAG,SDFM_FILTER_3_NEW_DATA_FLAG,
 //! SDFM_FILTER_4_NEW_DATA_FLAG,SDFM_FILTER_1_MOD_FAILED_FLAG,
 //! SDFM_FILTER_2_MOD_FAILED_FLAG,SDFM_FILTER_3_MOD_FAILED_FLAG,
@@ -972,17 +974,17 @@ SDFM_clearInterruptFlag(uint32_t base, uint32_t flag)
 
 //*****************************************************************************
 //
-//! Enable main interrupt.
+//! Enable master interrupt.
 //!
 //! \param base is the base address of the SDFM module
 //!
-//! This function enables the main SDFM interrupt.
+//! This function enables the master SDFM interrupt.
 //!
 //! \return None
 //!
 //*****************************************************************************
 static inline void
-SDFM_enableMainInterrupt(uint32_t base)
+SDFM_enableMasterInterrupt(uint32_t base)
 {
     ASSERT(SDFM_isBaseValid(base));
 
@@ -996,17 +998,17 @@ SDFM_enableMainInterrupt(uint32_t base)
 
 //*****************************************************************************
 //
-//! Disable main interrupt.
+//! Disable master interrupt.
 //!
 //! \param base is the base address of the SDFM module
 //!
-//! This function disables the main SDFM interrupt.
+//! This function disables the master SDFM interrupt.
 //!
 //! \return None
 //!
 //*****************************************************************************
 static inline void
-SDFM_disableMainInterrupt(uint32_t base)
+SDFM_disableMasterInterrupt(uint32_t base)
 {
     ASSERT(SDFM_isBaseValid(base));
 
@@ -1020,17 +1022,17 @@ SDFM_disableMainInterrupt(uint32_t base)
 
 //*****************************************************************************
 //
-//! Enable main filter.
+//! Enable master filter.
 //!
 //! \param base is the base address of the SDFM module
 //!
-//! This function enables main filter.
+//! This function enables master filter.
 //!
 //! \return None
 //!
 //*****************************************************************************
 static inline void
-SDFM_enableMainFilter(uint32_t base)
+SDFM_enableMasterFilter(uint32_t base)
 {
     ASSERT(SDFM_isBaseValid(base));
 
@@ -1044,17 +1046,17 @@ SDFM_enableMainFilter(uint32_t base)
 
 //*****************************************************************************
 //
-//! Disable main filter.
+//! Disable master filter.
 //!
 //! \param base is the base address of the SDFM module
 //!
-//! This function disables main filter.
+//! This function disables master filter.
 //!
 //! \return None
 //!
 //*****************************************************************************
 static inline void
-SDFM_disableMainFilter(uint32_t base)
+SDFM_disableMasterFilter(uint32_t base)
 {
     ASSERT(SDFM_isBaseValid(base));
 

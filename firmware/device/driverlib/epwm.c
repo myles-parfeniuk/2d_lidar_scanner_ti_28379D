@@ -5,8 +5,10 @@
 // TITLE:  C28x EPWM driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -76,12 +78,6 @@ void EPWM_configureSignal(uint32_t base, const EPWM_SignalParams *signalParams)
     ASSERT(EPWM_isBaseValid(base));
 
     //
-    // Valid values in the function for TBCTR Mode are UP, DOWN
-    // and UP-DOWN count.
-    //
-    ASSERT((uint16_t)signalParams->tbCtrMode <= 2U);
-
-    //
     // Configure EPWM clock Divider
     //
     SysCtl_setEPWMClockDivider(signalParams->epwmClkDiv);
@@ -102,43 +98,43 @@ void EPWM_configureSignal(uint32_t base, const EPWM_SignalParams *signalParams)
     // achieving desired signal
     //
     tbClkInHz = ((float32_t)signalParams->sysClkInHz /
-                 (float32_t)(1U << ((uint16_t)signalParams->epwmClkDiv +
+                (1U << ((uint16_t)signalParams->epwmClkDiv +
                  (uint16_t)signalParams->tbClkDiv)));
 
     if(signalParams->tbHSClkDiv <= EPWM_HSCLOCK_DIVIDER_4)
     {
-        tbClkInHz /= (float32_t)(1U << (uint16_t)signalParams->tbHSClkDiv);
+        tbClkInHz /= (1U << (uint16_t)signalParams->tbHSClkDiv);
     }
     else
     {
-        tbClkInHz /= (float32_t)(2U * (uint16_t)signalParams->tbHSClkDiv);
+        tbClkInHz /= (2U * (uint16_t)signalParams->tbHSClkDiv);
     }
 
     if(signalParams->tbCtrMode == EPWM_COUNTER_MODE_UP)
     {
         tbPrdVal = (uint16_t)((tbClkInHz / signalParams->freqInHz) - 1.0f);
-        cmpAVal = (uint16_t)(signalParams->dutyValA *
-                             (float32_t)(tbPrdVal + 1U));
-        cmpBVal = (uint16_t)(signalParams->dutyValB *
-                             (float32_t)(tbPrdVal + 1U));
+        cmpAVal = (uint16_t)((float32_t)signalParams->dutyValA *
+                             (tbPrdVal + 1U));
+        cmpBVal = (uint16_t)((float32_t)signalParams->dutyValB *
+                             (tbPrdVal + 1U));
     }
     else if(signalParams->tbCtrMode == EPWM_COUNTER_MODE_DOWN)
     {
         tbPrdVal = (uint16_t)((tbClkInHz / signalParams->freqInHz) - 1.0f);
-        cmpAVal = (uint16_t)((float32_t)(tbPrdVal + 1U) -
-                       (signalParams->dutyValA * (float32_t)(tbPrdVal + 1U)));
-        cmpBVal = (uint16_t)((float32_t)(tbPrdVal + 1U) -
-                       (signalParams->dutyValB * (float32_t)(tbPrdVal + 1U)));
+        cmpAVal = (uint16_t)((tbPrdVal + 1U) -
+                       ((float32_t)signalParams->dutyValA * (tbPrdVal + 1U)));
+        cmpBVal = (uint16_t)((tbPrdVal + 1U) -
+                       ((float32_t)signalParams->dutyValB * (tbPrdVal + 1U)));
     }
-    else
+    else if((signalParams->tbCtrMode == EPWM_COUNTER_MODE_UP_DOWN))
     {
         tbPrdVal = (uint16_t)(tbClkInHz / (2.0f * signalParams->freqInHz));
         cmpAVal = (uint16_t)(((float32_t)tbPrdVal -
-                             ((signalParams->dutyValA *
-                              (float32_t)tbPrdVal))) + 0.5f);
+                             ((float32_t)(signalParams->dutyValA *
+                              tbPrdVal))) + 0.5f);
         cmpBVal = (uint16_t)(((float32_t)tbPrdVal -
-                             ((signalParams->dutyValB *
-                              (float32_t)tbPrdVal))) + 0.5f);
+                             ((float32_t)(signalParams->dutyValB *
+                              tbPrdVal))) + 0.5f);
     }
 
     //
@@ -280,7 +276,7 @@ void EPWM_configureSignal(uint32_t base, const EPWM_SignalParams *signalParams)
                                           EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);
         }
     }
-    else
+    else if(signalParams->tbCtrMode == EPWM_COUNTER_MODE_UP_DOWN)
     {
         //
         // Clear PWMxA on Zero

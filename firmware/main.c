@@ -43,7 +43,7 @@ void main(void)
     Device_initGPIO(); //unlock gpio config registers, enable all respective pullups
     Interrupt_initModule(); //initialize port interrupt enable registers (PIE)
     Interrupt_initVectorTable(); //initialize PIE vector table with pointers to ISRs
-    Interrupt_enableGlobal(); //enable global interrupts
+    Interrupt_enableMaster(); //enable global interrupts
 
     uart_init(3100000U); //initialize uart with ~3MBaud transfer rate
     i2c_init(); //initialize I2C

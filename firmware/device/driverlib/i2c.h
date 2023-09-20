@@ -5,8 +5,10 @@
 // TITLE:  C28x I2C driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -64,7 +66,6 @@ extern "C"
 #include "inc/hw_types.h"
 #include "cpu.h"
 #include "debug.h"
-#include "hw_reg_inclusive_terminology.h"
 
 //*****************************************************************************
 //
@@ -75,15 +76,15 @@ extern "C"
 #ifndef DOXYGEN_PDF_IGNORE
 //*****************************************************************************
 //
-// I2C Controller commands.
+// I2C Master commands.
 //
 //*****************************************************************************
-#define I2C_CONTROLLER_SEND_MODE    0x0600U //!< Controller-transmitter mode
-#define I2C_CONTROLLER_RECEIVE_MODE 0x0400U //!< Controller-receiver mode
-#define I2C_TARGET_SEND_MODE        0x0200U //!< Target-transmitter mode
-#define I2C_TARGET_RECEIVE_MODE     0x0000U //!< Target-receiver mode
+#define I2C_MASTER_SEND_MODE    0x0600U //!< Master-transmitter mode
+#define I2C_MASTER_RECEIVE_MODE 0x0400U //!< Master-receiver mode
+#define I2C_SLAVE_SEND_MODE     0x0200U //!< Slave-transmitter mode
+#define I2C_SLAVE_RECEIVE_MODE  0x0000U //!< Slave-receiver mode
 
-#define I2C_REPEAT_MODE         0x0080U //!< Only applies to Controller mode
+#define I2C_REPEAT_MODE         0x0080U //!< Only applies to master mode
 #define I2C_START_BYTE_MODE     0x0010U //!< Enable start byte mode
 #define I2C_FREE_DATA_FORMAT    0x0008U //!< Enable free data (no addr) format
 
@@ -100,7 +101,7 @@ extern "C"
 #define I2C_INT_RX_DATA_RDY     0x00008U //!< Receive-data-ready interrupt
 #define I2C_INT_TX_DATA_RDY     0x00010U //!< Transmit-data-ready interrupt
 #define I2C_INT_STOP_CONDITION  0x00020U //!< Stop condition detected
-#define I2C_INT_ADDR_TARGET      0x00200U //!< Addressed as target interrupt
+#define I2C_INT_ADDR_SLAVE      0x00200U //!< Addressed as slave interrupt
 #define I2C_INT_RXFF            0x10000U //!< RX FIFO level interrupt
 #define I2C_INT_TXFF            0x20000U //!< TX FIFO level interrupt
 
@@ -114,7 +115,7 @@ extern "C"
                              (uint16_t)I2C_INT_RX_DATA_RDY |                   \
                              (uint16_t)I2C_INT_TX_DATA_RDY |                   \
                              (uint16_t)I2C_INT_STOP_CONDITION |                \
-                             (uint16_t)I2C_INT_ADDR_TARGET)
+                             (uint16_t)I2C_INT_ADDR_SLAVE)
 
 //*****************************************************************************
 //
@@ -129,12 +130,12 @@ extern "C"
 #define I2C_STS_TX_DATA_RDY     0x0010U //!< Transmit-data-ready
 #define I2C_STS_STOP_CONDITION  0x0020U //!< Stop condition detected
 #define I2C_STS_ADDR_ZERO       0x0100U //!< Address of all zeros detected
-#define I2C_STS_ADDR_TARGET     0x0200U //!< Addressed as target
+#define I2C_STS_ADDR_SLAVE      0x0200U //!< Addressed as slave
 #define I2C_STS_TX_EMPTY        0x0400U //!< Transmit shift register empty
 #define I2C_STS_RX_FULL         0x0800U //!< Receive shift register full
 #define I2C_STS_BUS_BUSY        0x1000U //!< Bus busy, wait for STOP or reset
 #define I2C_STS_NACK_SENT       0x2000U //!< NACK was sent
-#define I2C_STS_TARGET_DIR       0x4000U //!< Addressed as target transmitter
+#define I2C_STS_SLAVE_DIR       0x4000U //!< Addressed as slave transmitter
 #endif
 
 //*****************************************************************************
@@ -151,7 +152,7 @@ typedef enum
     I2C_INTSRC_RX_DATA_RDY,         //!< Receive-data-ready interrupt
     I2C_INTSRC_TX_DATA_RDY,         //!< Transmit-data-ready interrupt
     I2C_INTSRC_STOP_CONDITION,      //!< Stop condition detected
-    I2C_INTSRC_ADDR_TARGET           //!< Addressed as target interrupt
+    I2C_INTSRC_ADDR_SLAVE           //!< Addressed as slave interrupt
 } I2C_InterruptSource;
 
 //*****************************************************************************
@@ -258,7 +259,7 @@ typedef enum
 
 //*****************************************************************************
 //
-//! Values that can be passed to I2C_initController() as the \e dutyCycle
+//! Values that can be passed to I2C_initMaster() as the \e dutyCycle
 //! parameter.
 //
 //*****************************************************************************
@@ -539,80 +540,54 @@ I2C_getRxFIFOStatus(uint32_t base)
 
 //*****************************************************************************
 //
-//! Reads I2C Module clock prescaler value.
+//! Sets the address that the I2C Master places on the bus.
 //!
 //! \param base is the base address of the I2C instance used.
+//! \param slaveAddr 7-bit or 10-bit slave address
 //!
-//! This function reads the I2C prescaler value which configures the I2C module
-//! clock by dividing down the SYSCLK. I2C_MODULE_CLK = SYSCLK / (I2CPSC + )
-//!
-//! \return Returns the I2C prescaler(I2CPSC) cast as an uint16_t.
-//
-//*****************************************************************************
-static inline uint16_t
-I2C_getPreScaler(uint32_t base)
-{
-    //
-    // Check the arguments.
-    //
-    ASSERT(I2C_isBaseValid(base));
-
-    //
-    // Return the contents of the Prescaler register.
-    //
-    return(HWREGH(base + I2C_O_PSC));
-}
-
-//*****************************************************************************
-//
-//! Sets the address that the I2C Controller places on the bus.
-//!
-//! \param base is the base address of the I2C instance used.
-//! \param targetAddr 7-bit or 10-bit target address
-//!
-//! This function configures the address that the I2C Controller places on the bus
+//! This function configures the address that the I2C Master places on the bus
 //! when initiating a transaction.
 //!
 //! \return None.
 //
 //*****************************************************************************
 static inline void
-I2C_setTargetAddress(uint32_t base, uint16_t targetAddr)
+I2C_setSlaveAddress(uint32_t base, uint16_t slaveAddr)
 {
     //
     // Check the arguments.
     //
     ASSERT(I2C_isBaseValid(base));
-    ASSERT(targetAddr <= I2C_TAR_TAR_M);
+    ASSERT(slaveAddr <= I2C_SAR_SAR_M);
 
-    HWREGH(base + I2C_O_TAR) = targetAddr;
+    HWREGH(base + I2C_O_SAR) = slaveAddr;
 }
 
 //*****************************************************************************
 //
-//! Sets the own address for this I2C module.
+//! Sets the slave address for this I2C module.
 //!
-//! \param base is the base address of the I2C Target module.
-//! \param Addr is the 7-bit or 10-bit address
+//! \param base is the base address of the I2C Slave module.
+//! \param slaveAddr is the 7-bit or 10-bit slave address
 //!
-//! This function writes the specified address.
+//! This function writes the specified slave address.
 //!
-//! The parameter \e Addr is the value that is compared against the
-//! target address sent by an I2C controller.
+//! The parameter \e slaveAddr is the value that is compared against the
+//! slave address sent by an I2C master.
 //!
 //! \return None.
 //
 //*****************************************************************************
 static inline void
-I2C_setOwnAddress(uint32_t base, uint16_t Addr)
+I2C_setOwnSlaveAddress(uint32_t base, uint16_t slaveAddr)
 {
     //
     // Check the arguments.
     //
     ASSERT(I2C_isBaseValid(base));
-    ASSERT(Addr <= I2C_OAR_OAR_M);
+    ASSERT(slaveAddr <= I2C_OAR_OAR_M);
 
-    HWREGH(base + I2C_O_OAR) = Addr;
+    HWREGH(base + I2C_O_OAR) = slaveAddr;
 }
 
 //*****************************************************************************
@@ -622,7 +597,7 @@ I2C_setOwnAddress(uint32_t base, uint16_t Addr)
 //! \param base is the base address of the I2C instance used.
 //!
 //! This function returns an indication of whether or not the I2C bus is busy.
-//! This function can be used in a multi-controller environment to determine if the
+//! This function can be used in a multi-master environment to determine if the
 //! bus is free for another data transfer.
 //!
 //! \return Returns \b true if the I2C bus is busy; otherwise, returns
@@ -656,12 +631,12 @@ I2C_isBusBusy(uint32_t base)
 //! - \b I2C_STS_TX_DATA_RDY - Transmit-data-ready
 //! - \b I2C_STS_STOP_CONDITION - Stop condition detected
 //! - \b I2C_STS_ADDR_ZERO - Address of all zeros detected
-//! - \b I2C_STS_ADDR_TARGET - Addressed as Target
+//! - \b I2C_STS_ADDR_SLAVE - Addressed as slave
 //! - \b I2C_STS_TX_EMPTY - Transmit shift register empty
 //! - \b I2C_STS_RX_FULL - Receive shift register full
 //! - \b I2C_STS_BUS_BUSY - Bus busy, wait for STOP or reset
 //! - \b I2C_STS_NACK_SENT - NACK was sent
-//! - \b I2C_STS_TARGET_DIR- Addressed as Target transmitter
+//! - \b I2C_STS_SLAVE_DIR- Addressed as slave transmitter
 //
 //*****************************************************************************
 static inline uint16_t
@@ -693,7 +668,7 @@ I2C_getStatus(uint32_t base)
 //! - \b I2C_STS_RX_DATA_RDY
 //! - \b I2C_STS_STOP_CONDITION
 //! - \b I2C_STS_NACK_SENT
-//! - \b I2C_STS_TARGET_DIR
+//! - \b I2C_STS_SLAVE_DIR
 //!
 //! \note Note that some of the status flags returned by I2C_getStatus() cannot
 //! be cleared by this function. Some may only be cleared by hardware or a
@@ -723,14 +698,14 @@ I2C_clearStatus(uint32_t base, uint16_t stsFlags)
 //! \param base is the base address of the I2C instance used.
 //! \param config is the command to be issued to the I2C  module.
 //!
-//! This function is used to control the state of the controller and target send and
+//! This function is used to control the state of the master and slave send and
 //! receive operations. The \e config is a logical OR of the following options.
 //!
 //! One of the following four options:
-//! - \b I2C_CONTROLLER_SEND_MODE - Controller-transmitter mode
-//! - \b I2C_CONTROLLER_RECEIVE_MODE - Controller-receiver mode
-//! - \b I2C_TARGET_SEND_MODE - Target-transmitter mode
-//! - \b I2C_TARGET_RECEIVE_MODE - Target-receiver mode
+//! - \b I2C_MASTER_SEND_MODE - Master-transmitter mode
+//! - \b I2C_MASTER_RECEIVE_MODE - Master-receiver mode
+//! - \b I2C_SLAVE_SEND_MODE - Slave-transmitter mode
+//! - \b I2C_SLAVE_RECEIVE_MODE - Slave-receiver mode
 //!
 //! Any of the following:
 //! - \b I2C_REPEAT_MODE - Sends data until stop bit is set, ignores data count
@@ -752,7 +727,7 @@ I2C_setConfig(uint32_t base, uint16_t config)
     // Write the selected options to the mode register.
     //
     HWREGH(base + I2C_O_MDR) = (HWREGH(base + I2C_O_MDR) &
-                                ~(I2C_MDR_CNT | I2C_MDR_TRX | I2C_MDR_RM |
+                                ~(I2C_MDR_MST | I2C_MDR_TRX | I2C_MDR_RM |
                                   I2C_MDR_STB | I2C_MDR_FDF)) | config;
 }
 
@@ -792,7 +767,7 @@ I2C_setBitCount(uint32_t base, I2C_BitCount size)
 //!
 //! This function causes the I2C module to generate a start condition. This
 //! function is only valid when the I2C module specified by the \b base
-//! parameter is a controller.
+//! parameter is a master.
 //!
 //! \return None.
 //
@@ -819,7 +794,7 @@ I2C_sendStartCondition(uint32_t base)
 //!
 //! This function causes the I2C module to generate a stop condition. This
 //! function is only valid when the I2C module specified by the \b base
-//! parameter is a controller.
+//! parameter is a master.
 //!
 //! To check on the status of the STOP condition, I2C_getStopConditionStatus()
 //! can be used.
@@ -897,7 +872,7 @@ I2C_getData(uint32_t base)
 //! Transmits a byte from the I2C.
 //!
 //! \param base is the base address of the I2C instance used.
-//! \param data is the data to be transmitted from the I2C Controller.
+//! \param data is the data to be transmitted from the I2C Master.
 //!
 //! This function places the supplied data into I2C Data Transmit Register.
 //!
@@ -1043,7 +1018,7 @@ I2C_setEmulationMode(uint32_t base, I2C_EmulationMode mode)
 //!
 //! \param base is the base address of the I2C instance used.
 //!
-//! This function enables loopback mode. This mode is only valid during controller
+//! This function enables loopback mode. This mode is only valid during master
 //! mode and is helpful during device testing as it causes data transmitted out
 //! of the data transmit register to be received in data receive register.
 //!
@@ -1105,7 +1080,7 @@ I2C_disableLoopback(uint32_t base)
 //! - \b I2C_INTSRC_RX_DATA_RDY
 //! - \b I2C_INTSRC_TX_DATA_RDY
 //! - \b I2C_INTSRC_STOP_CONDITION
-//! - \b I2C_INTSRC_ADDR_TARGET
+//! - \b I2C_INTSRC_ADDR_SLAVE
 //!
 //! Calling this function will result in hardware automatically clearing the
 //! current interrupt code and if ready, loading the next pending enabled
@@ -1138,16 +1113,16 @@ I2C_getInterruptSource(uint32_t base)
 
 //*****************************************************************************
 //
-//! Initializes the I2C Controller.
+//! Initializes the I2C Master.
 //!
 //! \param base is the base address of the I2C instance used.
 //! \param sysclkHz is the rate of the clock supplied to the I2C module
 //! (SYSCLK) in Hz.
-//! \param bitRate is the rate of the controller clock signal, SCL.
+//! \param bitRate is the rate of the master clock signal, SCL.
 //! \param dutyCycle is duty cycle of the SCL signal.
 //!
-//! This function initializes operation of the I2C Controller by configuring the
-//! bus speed for the controller. Note that the I2C module \b must be put into
+//! This function initializes operation of the I2C Master by configuring the
+//! bus speed for the master. Note that the I2C module \b must be put into
 //! reset before calling this function. You can do this with the function
 //! I2C_disableModule().
 //!
@@ -1168,7 +1143,7 @@ I2C_getInterruptSource(uint32_t base)
 //
 //*****************************************************************************
 extern void
-I2C_initController(uint32_t base, uint32_t sysclkHz, uint32_t bitRate,
+I2C_initMaster(uint32_t base, uint32_t sysclkHz, uint32_t bitRate,
                I2C_DutyCycle dutyCycle);
 
 //*****************************************************************************
@@ -1178,7 +1153,7 @@ I2C_initController(uint32_t base, uint32_t sysclkHz, uint32_t bitRate,
 //! \param base is the base address of the I2C instance used.
 //! \param intFlags is the bit mask of the interrupt sources to be enabled.
 //!
-//! This function enables the indicated I2C Controller interrupt sources.  Only the
+//! This function enables the indicated I2C Master interrupt sources.  Only the
 //! sources that are enabled can be reflected to the processor interrupt.
 //! Disabled sources have no effect on the processor.
 //!
@@ -1190,7 +1165,7 @@ I2C_initController(uint32_t base, uint32_t sysclkHz, uint32_t bitRate,
 //! - \b I2C_INT_RX_DATA_RDY - Receive-data-ready interrupt
 //! - \b I2C_INT_TX_DATA_RDY - Transmit-data-ready interrupt
 //! - \b I2C_INT_STOP_CONDITION - Stop condition detected
-//! - \b I2C_INT_ADDR_TARGET - Addressed as target interrupt
+//! - \b I2C_INT_ADDR_SLAVE - Addressed as slave interrupt
 //! - \b I2C_INT_RXFF - RX FIFO level interrupt
 //! - \b I2C_INT_TXFF - TX FIFO level interrupt
 //!
@@ -1210,7 +1185,7 @@ I2C_enableInterrupt(uint32_t base, uint32_t intFlags);
 //! \param base is the base address of the I2C instance used.
 //! \param intFlags is the bit mask of the interrupt sources to be disabled.
 //!
-//! This function disables the indicated I2C Target interrupt sources.  Only
+//! This function disables the indicated I2C Slave interrupt sources.  Only
 //! the sources that are enabled can be reflected to the processor interrupt.
 //! Disabled sources have no effect on the processor.
 //!
@@ -1238,7 +1213,7 @@ I2C_disableInterrupt(uint32_t base, uint32_t intFlags);
 //! - \b I2C_INT_RX_DATA_RDY
 //! - \b I2C_INT_TX_DATA_RDY
 //! - \b I2C_INT_STOP_CONDITION
-//! - \b I2C_INT_ADDR_TARGET
+//! - \b I2C_INT_ADDR_SLAVE
 //! - \b I2C_INT_RXFF
 //! - \b I2C_INT_TXFF
 //!
@@ -1276,26 +1251,6 @@ I2C_getInterruptStatus(uint32_t base);
 //*****************************************************************************
 extern void
 I2C_clearInterruptStatus(uint32_t base, uint32_t intFlags);
-
-//*****************************************************************************
-//
-//! Configures I2C Module Clock Frequency
-//!
-//! \param base is the base address of the I2C instance used.
-//! \param sysclkHz is the rate of the clock supplied to the I2C module
-//! (SYSCLK) in Hz.
-//!
-//! This function configures I2C module clock frequency by initializing
-//! prescale register based on SYSCLK frequency.
-//! Note that the I2C module \b must be put into
-//! reset before calling this function. You can do this with the function
-//! I2C_disableModule().
-//!
-//! \return None.
-//
-//*****************************************************************************
-extern void
-I2C_configureModuleFrequency(uint32_t base, uint32_t sysclkHz);
 
 //*****************************************************************************
 //

@@ -5,8 +5,10 @@
 // TITLE:  C28x DAC driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -135,11 +137,11 @@ typedef enum
 static inline bool
 DAC_isBaseValid(uint32_t base)
 {
-    return(
+	return(
            (base == DACA_BASE) ||
            (base == DACB_BASE) ||
            (base == DACC_BASE)
-          );
+		  );
 }
 #endif
 

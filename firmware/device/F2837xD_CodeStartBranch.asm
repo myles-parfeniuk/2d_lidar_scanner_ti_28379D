@@ -25,10 +25,10 @@
 ;// to _c_init00 and thus there is no worry and this warning can be ignored.
 ;//
 ;//###########################################################################
-;//
-;// $Release Date:  $
+;// $TI Release: F2837xD Support Library v3.12.00.00 $
+;// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 ;// $Copyright:
-;// Copyright (C) 2013-2023 Texas Instruments Incorporated - http://www.ti.com/
+;// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 ;//
 ;// Redistribution and use in source and binary forms, with or without 
 ;// modification, are permitted provided that the following conditions 

@@ -5,8 +5,10 @@
 // TITLE:  C28x RAM config driver.
 //
 //###########################################################################
+// $TI Release: F2837xD Support Library v3.12.00.00 $
+// $Release Date: Fri Feb 12 19:03:23 IST 2021 $
 // $Copyright:
-// Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com
+// Copyright (C) 2013-2021 Texas Instruments Incorporated - http://www.ti.com/
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions 
@@ -268,7 +270,7 @@ MemCfg_setProtection(uint32_t memSection, uint32_t protectMode)
     //
     regOffset = (shiftVal & ~(0x1FU)) >> 4U;
     shiftVal &= 0x0001FU;
-    maskVal = (uint32_t)MEMCFG_XACCPROTX_M << shiftVal;
+    maskVal = MEMCFG_XACCPROTX_M << shiftVal;
     regVal = protectMode << shiftVal;
 
     //
@@ -306,12 +308,11 @@ MemCfg_setProtection(uint32_t memSection, uint32_t protectMode)
 
 //*****************************************************************************
 //
-// MemCfg_setLSRAMControllerSel
+// MemCfg_setLSRAMMasterSel
 //
 //*****************************************************************************
 void
-MemCfg_setLSRAMControllerSel(uint32_t ramSection,
-                             MemCfg_LSRAMControllerSel controllerSel)
+MemCfg_setLSRAMMasterSel(uint32_t ramSection, MemCfg_LSRAMMasterSel masterSel)
 {
     uint32_t shiftVal;
     uint32_t temp;
@@ -322,7 +323,7 @@ MemCfg_setLSRAMControllerSel(uint32_t ramSection,
     ASSERT((ramSection & MEMCFG_SECT_TYPE_MASK) == MEMCFG_SECT_TYPE_LS);
 
     //
-    // Calculate how far the controller select value needs to be shifted. Each
+    // Calculate how far the master select value needs to be shifted. Each
     // section number is represented by a bit in the lower word of ramSection
     // and 2 bits in the corresponding MSEL register.
     //
@@ -336,26 +337,25 @@ MemCfg_setLSRAMControllerSel(uint32_t ramSection,
     }
 
     //
-    // Write the controller select setting into the appropriate field
+    // Write the master select setting into the appropriate field
     //
     EALLOW;
 
     HWREG(MEMCFG_BASE + MEMCFG_O_LSXMSEL) =
         (HWREG(MEMCFG_BASE + MEMCFG_O_LSXMSEL) &
-         ~((uint32_t)MEMCFG_LSXMSEL_MSEL_LS0_M << shiftVal)) |
-        ((uint32_t)controllerSel << shiftVal);
+         ~(MEMCFG_LSXMSEL_MSEL_LS0_M << shiftVal)) |
+        ((uint32_t)masterSel << shiftVal);
 
     EDIS;
 }
 
 //*****************************************************************************
 //
-// MemCfg_setGSRAMControllerSel
+// MemCfg_setGSRAMMasterSel
 //
 //*****************************************************************************
 void
-MemCfg_setGSRAMControllerSel(uint32_t ramSections,
-                             MemCfg_GSRAMControllerSel controllerSel)
+MemCfg_setGSRAMMasterSel(uint32_t ramSections, MemCfg_GSRAMMasterSel masterSel)
 {
      uint32_t sectionNum;
 
@@ -370,10 +370,10 @@ MemCfg_setGSRAMControllerSel(uint32_t ramSections,
     sectionNum = ramSections & MEMCFG_SECT_NUM_MASK;
 
     //
-    // Write the controller select setting into the appropriate field.
+    // Write the master select setting into the appropriate field.
     //
     EALLOW;
-    if(controllerSel == MEMCFG_GSRAMCONTROLLER_CPU1)
+    if(masterSel == MEMCFG_GSRAMMASTER_CPU1)
     {
         HWREG(MEMCFG_BASE + MEMCFG_O_GSXMSEL) &= ~sectionNum;
     }
@@ -657,7 +657,7 @@ MemCfg_getCorrErrorAddress(uint32_t stsFlag)
         // For the sake of keeping this function portable to possible future
         // devices with other error types, it still takes a stsFlag parameter.
         //
-        ASSERT((bool)false);
+        ASSERT(false);
     }
 
     //
@@ -695,5 +695,4 @@ MemCfg_getUncorrErrorAddress(uint32_t stsFlag)
     //
     return(HWREG(address));
 }
-
 

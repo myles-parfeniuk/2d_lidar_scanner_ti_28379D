@@ -37,7 +37,7 @@ bool i2c_master_tx(uint8_t dev_addr, uint8_t *data, uint16_t data_length)
 
     I2C_setConfig(I2CA_BASE, I2C_MASTER_SEND_MODE);
     I2C_setDataCount(I2CA_BASE, data_length);
-    I2C_setTargetAddress(I2CA_BASE, dev_addr); //set target address for transaction
+    I2C_setSlaveAddress(I2CA_BASE, dev_addr); //set target address for transaction
 
     I2C_sendStartCondition(I2CA_BASE);
 
@@ -75,7 +75,7 @@ bool i2c_master_rx(uint8_t dev_addr, uint8_t *data, uint16_t data_length)
     i2c_init();
     I2C_setConfig(I2CA_BASE, I2C_MASTER_RECEIVE_MODE);
     I2C_setDataCount(I2CA_BASE, data_length);
-    I2C_setTargetAddress(I2CA_BASE, dev_addr); // Set target address for transaction
+    I2C_setSlaveAddress(I2CA_BASE, dev_addr); // Set target address for transaction
 
     I2C_sendStartCondition(I2CA_BASE);
 
