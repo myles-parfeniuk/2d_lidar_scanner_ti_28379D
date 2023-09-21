@@ -1,0 +1,1 @@
+"./28379D_i2c.obj" "./28379D_timer.obj" "./28379D_uart.obj" "./F2837xD_GlobalVariableDefs.obj" "./gpio.obj" "./main.obj" "../2837x_FLASH_lnk_cpu1.cmd" "../F2837xD_Headers_nonBIOS_cpu1.cmd" -llibc.a 

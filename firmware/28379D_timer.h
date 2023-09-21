@@ -1,23 +1,17 @@
-/***********************************************************************************
- * 28379D_timer.h
+/*
+ * gpio.h
  *
- * A module containing functions allowing for basic operation of TI tm320F828379D
- * controller's hardware timers (CPUTIMER0, CPUTIMER1, & CPUTIMER2).
- *
- *
- *
- * Author:    Myles Parfeniuk
- * Date:      10/09/2023
- * Modified:  10/09/2023
- *********************************************************************************/
+ *  Created on: Sep. 20, 2023
+ *      Author: myles
+ */
 
 #ifndef _28379D_TIMER_H_
 #define _28379D_TIMER_H_
+#include <Headers/F2837xD_device.h>
 
-//TI c2000Ware libraries
-#include "driverlib.h"
-#include "device.h"
 
+#define SYS_CLK_FREQ 200000000U
+#define CPU_TIMER_PRESC 0U
 
 //structure representing a single CPU timer
 typedef struct timer_t
@@ -28,6 +22,8 @@ typedef struct timer_t
 
 
 } timer_t;
+
+enum cpu_timer_modules {CPU_TIM_0, CPU_TIM_1};
 
 
 /***********************************************************************************
@@ -44,7 +40,7 @@ typedef struct timer_t
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
 bool timer_init(timer_t *timer_hdl);
 
@@ -64,9 +60,13 @@ bool timer_init(timer_t *timer_hdl);
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
 bool timer_set_freq(timer_t *timer_hdl);
 
 
-#endif /* _28379D_TIMER_H_ */
+static void cpu_timer_0_init(uint32_t period_count);
+static void cpu_timer_1_init(uint32_t period_count);
+
+
+#endif /*_28379D_TIMER_H_*/

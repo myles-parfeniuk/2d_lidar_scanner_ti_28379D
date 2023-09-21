@@ -31,10 +31,10 @@ enum lidar_measurement_states
     STATE_UNITIALIZED_LIDAR
 };
 
-const uint8_t lidar_cmd_distance[LIDAR_CMD_DIST_SZ]= {0x5A,0x05,0x00,0x01,0x60}; // get distance i2c command
-const uint8_t lidar_frame_rate_cmd[LIDAR_CMD_FRAME_RATE_SZ] = {0x5A, 0x06, 0x03, LIDAR_FRAME_RATE_LL, LIDAR_FRAME_RATE_HH, (uint8_t)LIDAR_FRAME_RATE_CHECKSUM}; // set frame rate i2c command
-const uint8_t rx_distance_1[LIDAR_DAT_DIST_SZ];
-const uint8_t rx_distance_2[LIDAR_DAT_DIST_SZ];
+const char lidar_cmd_distance[LIDAR_CMD_DIST_SZ]= {0x5A,0x05,0x00,0x01,0x60}; // get distance i2c command
+const char lidar_frame_rate_cmd[LIDAR_CMD_FRAME_RATE_SZ] = {0x5A, 0x06, 0x03, LIDAR_FRAME_RATE_LL, LIDAR_FRAME_RATE_HH, (char)LIDAR_FRAME_RATE_CHECKSUM}; // set frame rate i2c command
+const char rx_distance_1[LIDAR_DAT_DIST_SZ];
+const char rx_distance_2[LIDAR_DAT_DIST_SZ];
 
 
 

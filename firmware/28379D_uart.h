@@ -7,15 +7,14 @@
  *
  * Author:    Myles Parfeniuk
  * Date:      10/09/2023
- * Modified:  10/09/2023
+ * Modified:  10/20/2023
  *********************************************************************************/
 #ifndef _28379D_UART_H_
 #define _28379D_UART_H_
 
-//TI c2000Ware libraries
-#include "driverlib.h"
-#include "device.h"
+#include <Headers/F2837xD_device.h>
 
+#define LSP_CLK_FREQ 50000000U
 
 /***********************************************************************************
 *
@@ -31,7 +30,7 @@
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
 void uart_init(uint32_t baudrate);
 
@@ -49,7 +48,7 @@ void uart_init(uint32_t baudrate);
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
 void uart_tx_char(char tx_char);
 
@@ -68,7 +67,7 @@ void uart_tx_char(char tx_char);
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
 void uart_tx_str(char *tx_str);
 
@@ -88,11 +87,10 @@ void uart_tx_str(char *tx_str);
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
 void uart_tx_buff(char *tx_buff, uint16_t length);
 
-__interrupt void uart_timeout_ISR(void);
 
 
 #endif /*_28379D_UART_H_ */

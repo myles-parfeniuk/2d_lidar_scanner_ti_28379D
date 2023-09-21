@@ -6,17 +6,14 @@
  *
  * Author:    Myles Parfeniuk
  * Date:      10/09/2023
- * Modified:  10/09/2023
+ * Modified:  10/20/2023
  *********************************************************************************/
 #ifndef _28379D_I2C_H_
 #define _28379D_I2C_H_
 
 //TI c2000Ware libraries
-#include "driverlib.h"
-#include "device.h"
-
-#define PIN_I2C_SCLK 105 //sclk gpio
-#define PIN_I2C_SDA 104 //sdat gpio
+#include <Headers/F2837xD_device.h>
+#include <ctype.h>
 
 
 /***********************************************************************************
@@ -34,7 +31,7 @@
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
 void i2c_init();
 
@@ -56,9 +53,9 @@ void i2c_init();
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
-bool i2c_master_tx(uint8_t dev_addr, uint8_t *data, uint16_t data_length);
+bool i2c_master_tx(char dev_addr, char *data, uint16_t data_length);
 
 /***********************************************************************************
 *
@@ -77,9 +74,9 @@ bool i2c_master_tx(uint8_t dev_addr, uint8_t *data, uint16_t data_length);
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
-bool i2c_master_rx(uint8_t dev_addr, uint8_t *data, uint16_t data_length);
+bool i2c_master_rx(char dev_addr, char *data, uint16_t data_length);
 
 
 /***********************************************************************************
@@ -96,7 +93,7 @@ bool i2c_master_rx(uint8_t dev_addr, uint8_t *data, uint16_t data_length);
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/09/2023
+* Modified:  10/20/2023
 ************************************************************************************/
 static bool i2c_nack_check();
 

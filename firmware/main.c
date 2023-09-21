@@ -1,81 +1,58 @@
 
-/***********************************************************************************
- * main.c
- *
- * Firmware to interface TI tm320F828379D controller with Benewake TF-MINI-S
- * LiDAR sensor.
- * Continuously reads sensor data at a rate of ~800Hz and outputs to SCIA module
- * (USB comport) at a rate of ~3MBaud.
- *
- *
- * Author:    Myles Parfeniuk
- * Date:      10/09/2023
- * Modified:  10/09/2023
- *********************************************************************************/
-
-
 //standard c libraries
 #include <stdio.h>
-
-
-//TI c2000Ware libraries
-#include "driverlib.h"
-#include "device.h"
-
-//in-house libraries
+//TI includes
+#include <Headers/F2837xD_device.h>
+//in-house includes
+#include "gpio.h"
 #include "28379D_uart.h"
-#include "28379D_i2c.h"
 #include "28379D_timer.h"
+#include "28379D_i2c.h"
 #include "tf_mini_s_lidar.h"
 
-
-//isr routine for taking distance samples
 __interrupt void lidar_sampler_ISR(void);
+__interrupt void blink_ISR(void);
 
-timer_t lidar_sample_timer; //timer responsible for triggering lidar_sampler_ISR's respective interrupt
+//declare global variables:
+timer_t lidar_sample_timer =
+    {
+    .cb_ptr = &lidar_sampler_ISR,
+    .freq = 1000U,
+    .module = CPU_TIM_0
+    };
+
+    timer_t blink_timer =
+    {
+    .cb_ptr = &blink_ISR,
+    .freq = 5U,
+    .module = CPU_TIM_1
+    };
+
 char disp_buff[40]; //display buffer used to send distance reading to PC over UART
 
-
+//main code starts here:
 void main(void)
-{
-
-    Device_init(); //init system clock and peripherals
-    Device_initGPIO(); //unlock gpio config registers, enable all respective pullups
-    Interrupt_initModule(); //initialize port interrupt enable registers (PIE)
-    Interrupt_initVectorTable(); //initialize PIE vector table with pointers to ISRs
-    Interrupt_enableMaster(); //enable global interrupts
-
-    uart_init(3100000U); //initialize uart with ~3MBaud transfer rate
-    i2c_init(); //initialize I2C
-
-    //initialize lidar sampling timer
-    lidar_sample_timer.cb_ptr = &lidar_sampler_ISR;
-    lidar_sample_timer.freq = 1000;
-    lidar_sample_timer.module = CPUTIMER0_BASE;
-    timer_init(&lidar_sample_timer);
+   {
 
 
-    //configure IO_6 to be used as LED drive
-    GPIO_setPadConfig(6, GPIO_PIN_TYPE_PULLUP); //enable pullup
-    GPIO_writePin(6, 1); //set initial value to high
-    GPIO_setPinConfig(GPIO_6_GPIO6); //set pin config as GPIO pin, no peripheral to be muxed
-    GPIO_setDirectionMode(6, GPIO_DIR_MODE_OUT); //set as output
 
-    //set frame rate of lidar sensor
-    i2c_master_tx(ADDR_LIDAR_1, lidar_frame_rate_cmd, LIDAR_CMD_FRAME_RATE_SZ);
-    DEVICE_DELAY_US(100000); //delay 100ms according to TF-MINI-S data sheet
-    i2c_master_tx(ADDR_LIDAR_2, lidar_frame_rate_cmd, LIDAR_CMD_FRAME_RATE_SZ);
-    DEVICE_DELAY_US(100000); //delay 100ms according to TF-MINI-S data sheet
+       //initialization:
+       init_gpio(); //initialize gpio
+       uart_init(3000000U);
+       timer_init(&lidar_sample_timer); //initialize timer0
+       timer_init(&blink_timer); //initialize timer1
+       i2c_init();
 
-    while(1)
-    {
-        //toggle LED every 100ms
-        GPIO_togglePin(6);
-        DEVICE_DELAY_US(100000);
 
-    }
 
-}
+
+       while(1)
+       {
+
+       }
+
+   }
+
 
 
 //lidar sampling isr
@@ -83,10 +60,9 @@ void main(void)
 __interrupt void lidar_sampler_ISR(void)
 {
     //when true send request to lidar sensor for distance data (master tx), when false receive distance sample (master rx)
-    static uint8_t state = STATE_0_REQ_DIST_LIDAR_1;
+    static char state = STATE_0_REQ_DIST_LIDAR_1;
 
-
-    CPUTimer_disableInterrupt(lidar_sample_timer.module); //enable interrupt for respective timer module
+    CpuTimer0Regs.TCR.bit.TIE = 0; //disable timer 0 interrupts
 
     switch(state)
     {
@@ -125,8 +101,27 @@ __interrupt void lidar_sampler_ISR(void)
 
     }
 
-    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1); //clear CPUTIMER0 respective interrupt flags
     timer_set_freq(&lidar_sample_timer);
-    CPUTimer_enableInterrupt(lidar_sample_timer.module); //enable interrupt for respective timer module
+    //clear ACK group and re-enable timer 0 interrupts
+    EALLOW;
+    PieCtrlRegs.PIEACK.all = 0x0001;
+    CpuTimer0Regs.TCR.bit.TIE |= 1U; //enable interrupts
+    EDIS;
+
+
+}
+
+
+__interrupt void blink_ISR(void)
+{
+
+    CpuTimer1Regs.TCR.bit.TIE = 0; //disable timer 0 interrupts
+
+    GpioDataRegs.GPATOGGLE.bit.GPIO6 |= 1U;
+
+    EALLOW;
+    CpuTimer1Regs.TCR.bit.TIE |= 1U; //enable interrupts
+    EDIS;
+
 
 }
