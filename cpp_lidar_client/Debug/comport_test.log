@@ -1,0 +1,11 @@
+﻿  LidarBackend.cpp
+D:\development\ti\projects\2d_lidar_scanner_ti_28379D\cpp_lidar_client\gui\custom_windows\LidarDataWindow.hpp(26): warning C4091: 'typedef ': ignored on left of 'LidarDataWindow::lidar_data_log_t' when no variable is declared
+D:\development\ti\projects\2d_lidar_scanner_ti_28379D\cpp_lidar_client\backends\lidar_data_defs.h(9,2): warning C4091: 'typedef ': ignored on left of 'lidar_data_t' when no variable is declared
+  SerialPort.cpp
+D:\development\ti\projects\2d_lidar_scanner_ti_28379D\cpp_lidar_client\backends\SerialPort.cpp(70,27): warning C4244: 'initializing': conversion from 'time_t' to 'unsigned long', possible loss of data
+D:\development\ti\projects\2d_lidar_scanner_ti_28379D\cpp_lidar_client\backends\SerialPort.cpp(93,23): warning C4244: '=': conversion from 'time_t' to 'unsigned long', possible loss of data
+  main.cpp
+D:\development\ti\projects\2d_lidar_scanner_ti_28379D\cpp_lidar_client\gui\custom_windows\LidarDataWindow.hpp(26): warning C4091: 'typedef ': ignored on left of 'LidarDataWindow::lidar_data_log_t' when no variable is declared
+D:\development\ti\projects\2d_lidar_scanner_ti_28379D\cpp_lidar_client\backends\lidar_data_defs.h(9,2): warning C4091: 'typedef ': ignored on left of 'lidar_data_t' when no variable is declared
+  Generating Code...
+  comport_test.vcxproj -> D:\development\ti\projects\2d_lidar_scanner_ti_28379D\cpp_lidar_client\Debug\comport_test.exe
