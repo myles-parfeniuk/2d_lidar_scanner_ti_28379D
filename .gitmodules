@@ -1,0 +1,6 @@
+[submodule "cpp_lidar_client/vendor/imgui"]
+	path = cpp_lidar_client/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "cpp_lidar_client/vendor/implot"]
+	path = cpp_lidar_client/vendor/implot
+	url = https://github.com/epezent/implot.git
