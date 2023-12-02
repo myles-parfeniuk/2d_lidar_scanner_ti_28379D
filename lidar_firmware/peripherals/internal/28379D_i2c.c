@@ -84,7 +84,7 @@ bool i2c_master_tx(Uint8 dev_addr, const Uint8 *data, uint16_t data_length)
         I2caRegs.I2CIER.bit.XRDY =  1;
         I2caRegs.I2CIER.bit.NACK = 1;
 
-        //wait for HWI to post semaphore after byte is sent
+        //wait for HWI to post semaphore after DXR register is ready for next byte
         if(Semaphore_pend(i2c_tx_sem, I2C_TIMEOUT_MS))
         {
             if(nack_detected)
@@ -129,7 +129,7 @@ bool i2c_master_rx(Uint8 dev_addr, Uint8 *data, uint16_t data_length)
         I2caRegs.I2CIER.bit.RRDY =  1;
         I2caRegs.I2CIER.bit.NACK = 1;
 
-        //wait for HWI to post semaphore after byte is received
+        //wait for HWI to post semaphore after byte is received (DATA reg full)
         if(Semaphore_pend(i2c_rx_sem, I2C_TIMEOUT_MS))
         {
             if(nack_detected)

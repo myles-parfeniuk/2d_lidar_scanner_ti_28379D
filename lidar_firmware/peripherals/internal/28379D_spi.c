@@ -1,6 +1,6 @@
 #include "28379D_spi.h"
 
-void spi_init()
+void spi_init(uint64_t baud_rate)
 {
 
     EALLOW;
@@ -23,7 +23,7 @@ void spi_init()
     GpioCtrlRegs.GPDPUD.bit.GPIO123 = 0; //enable pullup
     GpioDataRegs.GPDSET.bit.GPIO123 = 1; //set CS as initially high
 
-    //If using SPISTE:
+    //If using SPISTE (built in chip select):
     /*GpioCtrlRegs.GPBDIR.bit.GPIO61 = 1U; //set as output
     GpioCtrlRegs.GPBPUD.bit.GPIO61 = 0; //enable pullup
     //mux CS line of SPIA peripheral to GPIO61
@@ -50,7 +50,7 @@ void spi_init()
     SpiaRegs.SPIPRI.bit.TRIWIRE = 1; //enable 3 wire mode
 
     //set baud rate
-    SpiaRegs.SPIBRR.bit.SPI_BIT_RATE = (LSP_CLK_FREQS/SPI_BAUD_RATE) - 1; //calculate correct divider (see 18.5.2.4)
+    SpiaRegs.SPIBRR.bit.SPI_BIT_RATE = (LSP_CLK_FREQS/baud_rate) - 1; //calculate correct divider (see 18.5.2.4)
 
     SpiaRegs.SPICCR.bit.SPICHAR = 0x7U;
 
@@ -62,25 +62,36 @@ void spi_init()
     EDIS;
 }
 
-void spi_transmit(Uint8 *data, uint16_t length)
+bool spi_transmit(Uint8 *data, uint16_t length)
 {
     uint16_t i = 0;
     uint16_t dummy_read = 0;
 
     ASSRT_CS;
-    //for(i = 0; i < 56; i++);//delay for approx 280ns
 
-    SpiaRegs.SPICTL.bit.TALK = 1;
+    SpiaRegs.SPICTL.bit.TALK = 1; //enable transmitting
 
     for(i = 0; i < length; i++)
     {
+        //enable transmit and receive interrupts
+        SpiaRegs.SPICTL.bit.SPIINTENA = 1;
         SpiaRegs.SPITXBUF = (data[i] << 8);
-        while(SpiaRegs.SPISTS.bit.INT_FLAG != 1) {}
-        dummy_read = SpiaRegs.SPIRXBUF;
 
-
+        if(!Semaphore_pend(spi_tx_sem, SPI_TIMEOUT_MS))
+            return false;
     }
 
-    for(i = 0; i < 50; i++); //delay
     DE_ASSRT_CS;
+
+    return true;
+}
+
+void spi_handler_ISR(void)
+{
+    static uint16_t dummy_read;
+
+    //disable transmit and receive interrupts
+    SpiaRegs.SPICTL.bit.SPIINTENA = 0;
+    dummy_read = SpiaRegs.SPIRXBUF;
+    Semaphore_post(spi_tx_sem);
 }

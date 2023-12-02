@@ -6,7 +6,7 @@
  *
  * Author:    Myles Parfeniuk
  * Date:      10/09/2023
- * Modified:  10/20/2023
+ * Modified:  12/02/2023
  *********************************************************************************/
 #ifndef _28379D_I2C_H_
 #define _28379D_I2C_H_
@@ -49,7 +49,7 @@ static volatile bool nack_detected = false; //global variable set by i2c_handler
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/20/2023
+* Modified:  12/02/2023
 ************************************************************************************/
 void i2c_init();
 
@@ -71,7 +71,7 @@ void i2c_init();
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/20/2023
+* Modified:  12/02/2023
 ************************************************************************************/
 bool i2c_master_tx(Uint8 dev_addr, const Uint8 *data, uint16_t data_length);
 
@@ -92,7 +92,7 @@ bool i2c_master_tx(Uint8 dev_addr, const Uint8 *data, uint16_t data_length);
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/20/2023
+* Modified:  12/02/2023
 ************************************************************************************/
 bool i2c_master_rx(Uint8 dev_addr, Uint8 *data, uint16_t data_length);
 
@@ -111,7 +111,7 @@ bool i2c_master_rx(Uint8 dev_addr, Uint8 *data, uint16_t data_length);
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/20/2023
+* Modified:  12/02/2023
 ************************************************************************************/
 static bool i2c_nack_check();
 
@@ -124,7 +124,7 @@ static bool i2c_nack_check();
 *
 * This handler is used to take action when the XRDY (transmit ready), RRDY (receive ready),
 * or NACK (not acknowledge) interrupt flags are asserted. It posts a semaphore leading
-* to the execution of either the i2c_master_tx or i2c_master_rx function accordingly.
+* to the continuation of the execution of either the i2c_master_tx or i2c_master_rx function accordingly.
 *
 * arguments:
 *           n/a
@@ -133,7 +133,7 @@ static bool i2c_nack_check();
 *
 * Author:    Myles Parfeniuk
 * Date:      10/09/2023
-* Modified:  10/20/2023
+* Modified:  12/02/2023
 ************************************************************************************/
 void i2c_handler_ISR(void);
 

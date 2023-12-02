@@ -86,9 +86,9 @@ void lidar_sample_task()
 int main()
 { 
     gpio_init();
-    uart_init(1000000U);
+    uart_init(1000000UL);
     i2c_init();
-    spi_init();
+    spi_init(4000000UL);
     stepper_init();
 
 
