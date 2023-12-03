@@ -8,9 +8,9 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-void uart_init(uint32_t baudrate)
+void uart_init(uint32_t baud_rate)
 {
-    uint32_t baud_reg_val = ((LSP_CLK_FREQ / (baudrate * 8U)) - 1U);
+    uint32_t baud_reg_val = ((LSP_CLK_FREQ / (baud_rate * 8U)) - 1U);
 
     EALLOW; //allow writes to protected registers
     CpuSysRegs.PCLKCR7.bit.SCI_A = 1; //enable SCIA module
@@ -72,6 +72,8 @@ void uart_init(uint32_t baudrate)
     SciaRegs.SCICTL1.bit.SWRESET = 0;
     SciaRegs.SCICTL1.bit.SWRESET = 1U;
 
+    SciaRegs.SCIFFRX.bit.RXFFIL = 1; //set RXFFINT level (RXFFINT asserted when receive FIFO contains one or more words)
+    SciaRegs.SCIFFRX.bit.RXFFIENA = 1; //enable FIFO receive interrupt (RXFFINT)
 
     EDIS; //disable writes to protected registers
 
@@ -80,11 +82,14 @@ void uart_init(uint32_t baudrate)
 
 void uart_tx_char(char tx_char)
 {
-    while(SciaRegs.SCIFFTX.bit.TXFFST != 0)
-        {
-            ; //wait until tx buffer is empty
-        }
-        SciaRegs.SCITXBUF.bit.TXDT = tx_char;
+    SciaRegs.SCIFFTX.bit.TXFFIL = 0; //set TXFFINT level (TXFFINT asserted when Transmit FIFO is empty)
+    SciaRegs.SCIFFTX.bit.TXFFIENA = 1; //enable FIFO transmit interrupt (TXFFINT)
+
+    //wait for HWI to post send semaphore
+    Semaphore_pend(uart_tx_sem, 5U);
+
+    //write next byte to transmit
+    SciaRegs.SCITXBUF.bit.TXDT = tx_char;
 
 
 }
@@ -125,3 +130,38 @@ void uart_tx_buff(char *tx_buff, uint16_t length)
     }
 }
 
+void uart_rx_SWI(void)
+{
+    static char rx_str[100];
+    static Uint8 index = 0;
+
+    //only receive up to 100 chars, reset index otherwise
+    if(index >= MAX_RX_STR_BYTES)
+        index = 0;
+
+    rx_str[index++] = SciaRegs.SCIRXBUF.bit.SAR; //read the received character
+
+    SciaRegs.SCIFFRX.bit.RXFFINTCLR = 1; //clear RXFFINT flag
+    SciaRegs.SCIFFRX.bit.RXFFIENA = 1; //re-enable FIFO receive interrupt (RXFFINT)
+
+    //detect EOL delimiters (in this case, enter or new line keys)
+    if(rx_str[index-1] == '\r' || rx_str[index-1] == '\n')
+    {
+        rx_str[index-1] = '\0'; //add null key to terminate string
+        index  = 0; //reset index
+
+        //post any SWIs or semaphores here
+    }
+}
+
+void uart_tx_handler_ISR(void)
+{
+    SciaRegs.SCIFFTX.bit.TXFFIENA = 0; //disable FIFO transmit interrupt (TXFFINT)
+    Semaphore_post(uart_tx_sem);
+}
+
+void uart_rx_handler_ISR(void)
+{
+   SciaRegs.SCIFFRX.bit.RXFFIENA = 0; //disable FIFO receive interrupt (RXFFINT)
+   Swi_post(uart_rx_swi_hdl);
+}

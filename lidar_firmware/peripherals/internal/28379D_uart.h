@@ -16,8 +16,14 @@
 #include <stdint.h>
 //TI Includes
 #include <Headers/F2837xD_device.h>
+#include <ti/sysbios/knl/Semaphore.h>
+#include <ti/sysbios/knl/Swi.h>
 
 #define LSP_CLK_FREQ 50000000U
+#define MAX_RX_STR_BYTES 99
+
+extern const Semaphore_Handle uart_tx_sem; //Semaphore used for synchronization of UART transmitting events
+extern const Swi_Handle uart_rx_swi_hdl; //SWI handle associated with SWI used for servicing UART receive events
 
 /***********************************************************************************
 *
@@ -35,7 +41,7 @@
 * Date:      10/09/2023
 * Modified:  10/20/2023
 ************************************************************************************/
-void uart_init(uint32_t baudrate);
+void uart_init(uint32_t baud_rate);
 
 /***********************************************************************************
 *
@@ -54,7 +60,6 @@ void uart_init(uint32_t baudrate);
 * Modified:  10/20/2023
 ************************************************************************************/
 void uart_tx_char(char tx_char);
-
 
 /***********************************************************************************
 *
@@ -93,6 +98,9 @@ void uart_tx_str(const char *format, ...);
 ************************************************************************************/
 void uart_tx_buff(char *tx_buff, uint16_t length);
 
+void uart_rx_SWI(void);
+void uart_tx_handler_ISR(void);
+void uart_rx_handler_ISR(void);
 
 
 #endif /*_28379D_UART_H_ */

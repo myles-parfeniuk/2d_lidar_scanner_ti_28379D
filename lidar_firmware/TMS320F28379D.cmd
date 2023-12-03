@@ -69,10 +69,10 @@ PAGE 1 : /* Data Memory */
 
     M01SARAM : origin = 0x000122, length = 0x0006DE  /* on-chip RAM */
 
-    LS05SARAM : origin = 0x008000, length = 0x008000 /* on-chip RAM */
+    LS05SARAM : origin = 0x008000, length = 0x008e0c /* on-chip RAM */
 
     /* on-chip Global shared RAMs */
-    RAMGS0  : origin = 0x010000, length = 0x001000
+    RAMGS0  : origin = 0x010e0c, length = 0x0001f4
     RAMGS1  : origin = 0x011000, length = 0x001000
     RAMGS2  : origin = 0x012000, length = 0x001000
     RAMGS3  : origin = 0x013000, length = 0x001000

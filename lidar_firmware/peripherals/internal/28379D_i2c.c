@@ -46,11 +46,6 @@ void i2c_init()
     I2caRegs.I2CMDR.bit.BC = 0; //8 bits per transmission
     I2caRegs.I2CMDR.bit.XA = 0; //7 bit addressing mode
 
-    //disable fifo
-    I2caRegs.I2CFFTX.bit.I2CFFEN = 0;
-    I2caRegs.I2CFFTX.bit.TXFFRST = 0;
-    I2caRegs.I2CFFRX.bit.RXFFRST = 0;
-
     //disable interrupts
     I2caRegs.I2CIER.bit.XRDY = 0;
     I2caRegs.I2CIER.bit.RRDY = 0;

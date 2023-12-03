@@ -65,7 +65,6 @@ void spi_init(uint64_t baud_rate)
 bool spi_transmit(Uint8 *data, uint16_t length)
 {
     uint16_t i = 0;
-    uint16_t dummy_read = 0;
 
     ASSRT_CS;
 
@@ -88,7 +87,7 @@ bool spi_transmit(Uint8 *data, uint16_t length)
 
 void spi_handler_ISR(void)
 {
-    static uint16_t dummy_read;
+    static uint16_t dummy_read = 0;
 
     //disable transmit and receive interrupts
     SpiaRegs.SPICTL.bit.SPIINTENA = 0;
