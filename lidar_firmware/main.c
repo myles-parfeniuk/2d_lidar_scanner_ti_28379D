@@ -30,6 +30,9 @@ extern const Task_Handle step_tsk_hdl; //Task for stepper OK
 extern const Task_Handle oled_display_tsk_hdl;
 extern const Task_Handle pc_data_tx_tsk_hdl;
 
+extern const Semaphore_Handle step_to_sample_sem; //semaphore used for sychronized stepper and sample tasks
+extern const Semaphore_Handle sample_to_step_sem; //semaphore used for sychronized stepper and sample tasks
+
 Mailbox_Handle distance_to_oled_mailbox;
 Mailbox_Handle distance_to_pc_mailbox;
 
@@ -37,7 +40,9 @@ void step_task()
 {
     while(1)
     {
-        stepper_step();
+        stepper_step(10);
+        Semaphore_post(step_to_sample_sem);
+        Semaphore_pend(sample_to_step_sem, BIOS_WAIT_FOREVER);
     }
 }
 
@@ -52,15 +57,18 @@ void lidar_sample_task()
    while(1)
     {
         lidar_request_distance(ADDR_LIDAR_1);
-        Task_sleep(5U);
+        Task_sleep(1U);
         lidar_request_distance(ADDR_LIDAR_2);
-        Task_sleep(5U);
+        Task_sleep(1U);
         lidar_read_distance(ADDR_LIDAR_1, distance_buffer);
-        Task_sleep(2U);
+        Task_sleep(1U);
         lidar_read_distance(ADDR_LIDAR_2, (distance_buffer + 1));
+        Task_sleep(1U);
 
         Mailbox_post(distance_to_oled_mailbox, distance_buffer, BIOS_NO_WAIT);
         Mailbox_post(distance_to_pc_mailbox, distance_buffer, BIOS_WAIT_FOREVER);
+        Semaphore_post(sample_to_step_sem);
+        Semaphore_pend(step_to_sample_sem, BIOS_WAIT_FOREVER);
     }
 
 
