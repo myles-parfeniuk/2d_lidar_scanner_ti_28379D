@@ -19,6 +19,8 @@
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/sysbios/knl/Semaphore.h>
+#include <ti/sysbios/knl/Swi.h>
+
 
 #define SYS_CLK_FREQ 200000000UL //system clock frequency
 #define SCLK_FREQ 100000UL //desired i2c sclk frequency
@@ -32,7 +34,14 @@
 
 extern const Semaphore_Handle i2c_tx_sem; //Semaphore used for synchronization of I2C transmitting events
 extern const Semaphore_Handle i2c_rx_sem; //Semaphore used for synchronization of I2C receiving events
+extern const Swi_Handle i2c_tx_swi_hdl; //SWI handle associated with SWI used for servicing I2C transmitting events
+extern const Swi_Handle i2c_rx_swi_hdl; //SWI handle associated with SWI used for servicing I2C receiving events
+
 static volatile bool nack_detected = false; //global variable set by i2c_handler_ISR if a slave NACK is detected
+static volatile uint16_t data_tx_length = 0;
+static volatile Uint8 *tx_buffer;
+static volatile uint16_t data_rx_length = 0;
+static volatile Uint8 *rx_buffer;
 
 /***********************************************************************************
 *
@@ -114,6 +123,9 @@ bool i2c_master_rx(Uint8 dev_addr, Uint8 *data, uint16_t data_length);
 * Modified:  12/02/2023
 ************************************************************************************/
 static bool i2c_nack_check();
+
+void i2c_tx_handler_SWI(void);
+void i2c_rx_handler_SWI(void);
 
 /***********************************************************************************
 *

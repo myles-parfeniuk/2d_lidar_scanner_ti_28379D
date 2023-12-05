@@ -215,6 +215,7 @@ peripherals/external/tf_mini_s_lidar.obj: C:/ti/bios_6_83_00_18/packages/ti/sysb
 peripherals/external/tf_mini_s_lidar.obj: C:/ti/ccs1040/xdctools_3_62_01_15_core/packages/xdc/runtime/IModule.h
 peripherals/external/tf_mini_s_lidar.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Event__epilogue.h
 peripherals/external/tf_mini_s_lidar.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Semaphore__epilogue.h
+peripherals/external/tf_mini_s_lidar.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Swi.h
 
 ../peripherals/external/tf_mini_s_lidar.c:
 
@@ -645,4 +646,6 @@ C:/ti/ccs1040/xdctools_3_62_01_15_core/packages/xdc/runtime/IModule.h:
 C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Event__epilogue.h:
 
 C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Semaphore__epilogue.h:
+
+C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Swi.h:
 

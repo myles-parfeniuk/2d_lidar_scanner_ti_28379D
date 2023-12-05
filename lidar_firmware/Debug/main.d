@@ -250,6 +250,7 @@ main.obj: C:/ti/ccs1040/ccs/tools/compiler/ti-cgt-c2000_20.2.5.LTS/include/_isfu
 main.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/BIOS.h
 main.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Task.h
 main.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Semaphore.h
+main.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Swi.h
 main.obj: ../peripherals/internal/28379D_spi.h
 main.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/BIOS.h
 main.obj: C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Task.h
@@ -795,6 +796,8 @@ C:/ti/bios_6_83_00_18/packages/ti/sysbios/BIOS.h:
 C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Task.h:
 
 C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Semaphore.h:
+
+C:/ti/bios_6_83_00_18/packages/ti/sysbios/knl/Swi.h:
 
 ../peripherals/internal/28379D_spi.h:
 

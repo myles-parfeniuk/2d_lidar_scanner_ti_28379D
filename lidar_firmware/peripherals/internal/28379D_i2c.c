@@ -61,8 +61,6 @@ void i2c_init()
 bool i2c_master_tx(Uint8 dev_addr, const Uint8 *data, uint16_t data_length)
 {
 
-    uint16_t i = 0;
-
     //prep for transmit
     I2caRegs.I2CMDR.bit.MST = 1; //enable master mode
     I2caRegs.I2CMDR.bit.TRX = 1; //enable transmitter mode
@@ -72,34 +70,23 @@ bool i2c_master_tx(Uint8 dev_addr, const Uint8 *data, uint16_t data_length)
 
     //start transaction
     I2caRegs.I2CMDR.bit.STT = 1; //assert start condition
+    tx_buffer = data;
+    data_tx_length = data_length;
 
-    for(i = 0; i < data_length; i++)
+    //enable transmit and NACK interrupt
+    I2caRegs.I2CIER.bit.XRDY =  1;
+    I2caRegs.I2CIER.bit.NACK = 1;
+
+    //wait for SWI to post semaphore
+    if(Semaphore_pend(i2c_tx_sem, I2C_TIMEOUT_MS))
     {
-        //enable transmit and NACK interrupt
-        I2caRegs.I2CIER.bit.XRDY =  1;
-        I2caRegs.I2CIER.bit.NACK = 1;
-
-        //wait for HWI to post semaphore after DXR register is ready for next byte
-        if(Semaphore_pend(i2c_tx_sem, I2C_TIMEOUT_MS))
-        {
-            if(nack_detected)
-                return false; //fail transaction, slave did not ACK transmission
-            else
-                I2caRegs.I2CDXR.bit.DATA = data[i]; //load the next byte
-        }
+        if(nack_detected)
+            return false; //fail transaction, slave did not ACK transmission
         else
-        {
-            I2caRegs.I2CMDR.bit.STP = 1;//assert stop condition
-            return false; //fail transaction, timed out
-        }
-
+            return true;
     }
-
-    //end successful transaction
-    I2caRegs.I2CMDR.bit.STP = 1;//assert stop condition
-
-    return true;
-
+    else
+        return false; //fail transaction, timed out
 
 }
 
@@ -116,42 +103,23 @@ bool i2c_master_rx(Uint8 dev_addr, Uint8 *data, uint16_t data_length)
 
     //start transaction
     I2caRegs.I2CMDR.bit.STT = 1; //assert start condition
+    rx_buffer = data;
+    data_rx_length = data_length;
 
+    //enable receive and NACK interrupt
+    I2caRegs.I2CIER.bit.RRDY =  1;
+    I2caRegs.I2CIER.bit.NACK = 1;
 
-    for (i = 0; i < data_length; i++)
+    if(Semaphore_pend(i2c_rx_sem, I2C_TIMEOUT_MS))
     {
-        //enable receive and NACK interrupt
-        I2caRegs.I2CIER.bit.RRDY =  1;
-        I2caRegs.I2CIER.bit.NACK = 1;
-
-        //wait for HWI to post semaphore after byte is received (DATA reg full)
-        if(Semaphore_pend(i2c_rx_sem, I2C_TIMEOUT_MS))
-        {
-            if(nack_detected)
-            {
-                return false; //fail transaction, slave NACKed read request
-            }
-            else
-            {
-                if (i == (data_length - 2))
-                     I2caRegs.I2CMDR.bit.NACKMOD = 1;
-
-                // Read the received data
-                data[i] = (char)I2caRegs.I2CDRR.bit.DATA;
-            }
-
-        }
+        if(nack_detected)
+            return false;
         else
-        {
-             I2caRegs.I2CMDR.bit.STP = 1;//assert stop condition
-             return false; //fail transaction, timed out
-        }
-
-
-
+            return true;
     }
+    else
+        return false; //fail transaction, timed out
 
-    I2caRegs.I2CMDR.bit.STP = 1;//assert stop condition
 
     return true;
 }
@@ -172,35 +140,94 @@ bool i2c_nack_check()
     return false;
 }
 
+void i2c_tx_handler_SWI(void)
+{
+    static uint16_t i = 0;
+
+    //check for slave NACK
+    nack_detected = i2c_nack_check();
+
+    if(nack_detected)
+        Semaphore_post(i2c_tx_sem); //slave failed to ack, post sem and fail transaction
+    else
+    {
+        I2caRegs.I2CDXR.bit.DATA = tx_buffer[i];
+        i++;
+    }
+
+    if(i >= data_tx_length)
+    {
+        i = 0;
+        //end successful transaction
+        I2caRegs.I2CMDR.bit.STP = 1;//assert stop condition
+        Semaphore_post(i2c_tx_sem); //post sem, transaction succeeded
+    }
+    else
+    {
+        //re-enable interrupts for next byte
+        I2caRegs.I2CIER.bit.XRDY =  1;
+        I2caRegs.I2CIER.bit.NACK = 1;
+    }
+
+
+
+}
+
+void i2c_rx_handler_SWI(void)
+{
+    static uint16_t i = 0;
+
+    //check for slave NACK
+    nack_detected = i2c_nack_check();
+
+    if(nack_detected)
+        Semaphore_post(i2c_rx_sem); //slave failed to ack, post sem and fail transaction
+    else
+    {
+        //master must assert NACK on second to last byte (see tech ref manual), this NACK tells the slave the master is done receiving
+        if(i == (data_rx_length - 2))
+            I2caRegs.I2CMDR.bit.NACKMOD = 1; //assert NACK
+
+        rx_buffer[i] = I2caRegs.I2CDRR.bit.DATA;
+        i++;
+    }
+
+    if(i >= data_rx_length)
+    {
+        i = 0;
+        //end successful transaction
+        I2caRegs.I2CMDR.bit.STP = 1;//assert stop condition
+        Semaphore_post(i2c_rx_sem); //post sem, transaction succeeded
+    }
+    else
+    {
+        //enable receive and NACK interrupt
+        I2caRegs.I2CIER.bit.RRDY =  1;
+        I2caRegs.I2CIER.bit.NACK = 1;
+    }
+
+}
+
 void i2c_handler_ISR(void)
 {
     EALLOW; //allow access to protected registers
-
 
     if(TX_MODE)
     {
         //disable all used i2c interrupts
         I2caRegs.I2CIER.bit.NACK = 0;
         I2caRegs.I2CIER.bit.XRDY = 0;
+        Swi_post(i2c_tx_swi_hdl);
 
-        //check for slave NACK
-        nack_detected = i2c_nack_check();
-
-        //post send
-        Semaphore_post(i2c_tx_sem);
     }
     else if(RX_MODE)
     {
         //disable all used i2c interrupts
         I2caRegs.I2CIER.bit.NACK = 0;
         I2caRegs.I2CIER.bit.RRDY = 0;
-
-        //check for slave NACK
-        nack_detected = i2c_nack_check();
-
-        //post receive
-        Semaphore_post(i2c_rx_sem);
+        Swi_post(i2c_rx_swi_hdl);
     }
+
 
     EDIS; //disallow access to protected register
 }
