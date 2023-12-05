@@ -224,14 +224,4 @@ void oled_draw_string(int16_t x_1, int16_t y_1, intensity_t intensity, font_def_
 }
 
 
-void oled_set_orientation(bool flipped)
-{
-    //rotate orientation 180 degrees
-    if(flipped)
-    {
-        //oled_cmd_set_row_addr(32);
-        //oled_cmd_set_scan_dir(false);
-        //oled_cmd_set_segment_remap(true);
-    }
-}
 

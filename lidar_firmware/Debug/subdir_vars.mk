@@ -14,6 +14,7 @@ CMD_SRCS += \
 
 C_SRCS += \
 ../F2837xD_GlobalVariableDefs.c \
+../delay_timer.c \
 ../main.c 
 
 GEN_CMDS += \
@@ -28,6 +29,7 @@ GEN_MISC_DIRS += \
 
 C_DEPS += \
 ./F2837xD_GlobalVariableDefs.d \
+./delay_timer.d \
 ./main.d 
 
 GEN_OPTS += \
@@ -35,6 +37,7 @@ GEN_OPTS += \
 
 OBJS += \
 ./F2837xD_GlobalVariableDefs.obj \
+./delay_timer.obj \
 ./main.obj 
 
 GEN_MISC_DIRS__QUOTED += \
@@ -42,10 +45,12 @@ GEN_MISC_DIRS__QUOTED += \
 
 OBJS__QUOTED += \
 "F2837xD_GlobalVariableDefs.obj" \
+"delay_timer.obj" \
 "main.obj" 
 
 C_DEPS__QUOTED += \
 "F2837xD_GlobalVariableDefs.d" \
+"delay_timer.d" \
 "main.d" 
 
 GEN_FILES__QUOTED += \
@@ -54,6 +59,7 @@ GEN_FILES__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../F2837xD_GlobalVariableDefs.c" \
+"../delay_timer.c" \
 "../main.c" 
 
 

@@ -11,6 +11,7 @@ GEN_CMDS__FLAG := -l"configPkg/linker.cmd"
 
 ORDERED_OBJS += \
 "./F2837xD_GlobalVariableDefs.obj" \
+"./delay_timer.obj" \
 "./main.obj" \
 "./peripherals/external/oled/SH1122_fonts.obj" \
 "./peripherals/external/oled/SH1122_oled.obj" \
@@ -174,8 +175,8 @@ lidar_firmware_v2.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "F2837xD_GlobalVariableDefs.obj" "main.obj" "peripherals\external\oled\SH1122_fonts.obj" "peripherals\external\oled\SH1122_oled.obj" "peripherals\external\oled\fonts\SH1122_font_f10x16f.obj" "peripherals\external\oled\fonts\SH1122_font_f6x8_mono.obj" "peripherals\external\stepper.obj" "peripherals\external\tf_mini_s_lidar.obj" "peripherals\internal\28379D_i2c.obj" "peripherals\internal\28379D_spi.obj" "peripherals\internal\28379D_uart.obj" "peripherals\internal\gpio.obj" 
-	-$(RM) "F2837xD_GlobalVariableDefs.d" "main.d" "peripherals\external\oled\SH1122_fonts.d" "peripherals\external\oled\SH1122_oled.d" "peripherals\external\oled\fonts\SH1122_font_f10x16f.d" "peripherals\external\oled\fonts\SH1122_font_f6x8_mono.d" "peripherals\external\stepper.d" "peripherals\external\tf_mini_s_lidar.d" "peripherals\internal\28379D_i2c.d" "peripherals\internal\28379D_spi.d" "peripherals\internal\28379D_uart.d" "peripherals\internal\gpio.d" 
+	-$(RM) "F2837xD_GlobalVariableDefs.obj" "delay_timer.obj" "main.obj" "peripherals\external\oled\SH1122_fonts.obj" "peripherals\external\oled\SH1122_oled.obj" "peripherals\external\oled\fonts\SH1122_font_f10x16f.obj" "peripherals\external\oled\fonts\SH1122_font_f6x8_mono.obj" "peripherals\external\stepper.obj" "peripherals\external\tf_mini_s_lidar.obj" "peripherals\internal\28379D_i2c.obj" "peripherals\internal\28379D_spi.obj" "peripherals\internal\28379D_uart.obj" "peripherals\internal\gpio.obj" 
+	-$(RM) "F2837xD_GlobalVariableDefs.d" "delay_timer.d" "main.d" "peripherals\external\oled\SH1122_fonts.d" "peripherals\external\oled\SH1122_oled.d" "peripherals\external\oled\fonts\SH1122_font_f10x16f.d" "peripherals\external\oled\fonts\SH1122_font_f6x8_mono.d" "peripherals\external\stepper.d" "peripherals\external\tf_mini_s_lidar.d" "peripherals\internal\28379D_i2c.d" "peripherals\internal\28379D_spi.d" "peripherals\internal\28379D_uart.d" "peripherals\internal\gpio.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
 	-@echo ' '

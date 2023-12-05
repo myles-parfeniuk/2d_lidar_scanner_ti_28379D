@@ -25,6 +25,8 @@
 #define LIDAR_FRAME_RATE_HH 0x03 //high byte of frame rate
 #define LIDAR_FRAME_RATE_LL 0xE8 //low byte of frame rate
 
+#define LIDAR_MAX_MEASUREMENT_RANGE 13000UL
+
 enum lidar_measurement_states
 {
     STATE_0_REQ_DIST_LIDAR_1,   //request distance sensor 1
