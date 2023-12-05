@@ -41,7 +41,7 @@ static volatile bool nack_detected = false; //global variable set by i2c_handler
 static volatile uint16_t data_tx_length = 0;
 static volatile Uint8 *tx_buffer;
 static volatile uint16_t data_rx_length = 0;
-static volatile Uint8 *rx_buffer;
+static volatile Uint8 rx_buffer[50];
 
 /***********************************************************************************
 *

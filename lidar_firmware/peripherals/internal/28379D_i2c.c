@@ -73,7 +73,12 @@ bool i2c_master_tx(Uint8 dev_addr, const Uint8 *data, uint16_t data_length)
     tx_buffer = data;
     data_tx_length = data_length;
 
+    //clear flags before enabling interrupts by soft reseting I2C module
+    I2caRegs.I2CMDR.bit.IRS = 0; //re-enable i2c module A
+    I2caRegs.I2CMDR.bit.IRS = 1; //re-enable i2c module A
+
     //enable transmit and NACK interrupt
+    I2caRegs.I2CIER.bit.RRDY =  0;
     I2caRegs.I2CIER.bit.XRDY =  1;
     I2caRegs.I2CIER.bit.NACK = 1;
 
@@ -103,10 +108,13 @@ bool i2c_master_rx(Uint8 dev_addr, Uint8 *data, uint16_t data_length)
 
     //start transaction
     I2caRegs.I2CMDR.bit.STT = 1; //assert start condition
-    rx_buffer = data;
     data_rx_length = data_length;
 
+    //clear flags before enabling interrupts by soft reseting I2C module
+    I2caRegs.I2CMDR.bit.IRS = 0; //re-enable i2c module A
+    I2caRegs.I2CMDR.bit.IRS = 1; //re-enable i2c module A
     //enable receive and NACK interrupt
+    I2caRegs.I2CIER.bit.XRDY =  0;
     I2caRegs.I2CIER.bit.RRDY =  1;
     I2caRegs.I2CIER.bit.NACK = 1;
 
@@ -115,13 +123,15 @@ bool i2c_master_rx(Uint8 dev_addr, Uint8 *data, uint16_t data_length)
         if(nack_detected)
             return false;
         else
+        {
+            for(i = 0; i < data_length; i++)
+                data[i] = rx_buffer[i];
             return true;
+        }
     }
     else
         return false; //fail transaction, timed out
 
-
-    return true;
 }
 
 bool i2c_nack_check()
