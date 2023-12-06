@@ -124,8 +124,8 @@ GEN_OPTS__QUOTED :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 . \
+peripherals/external \
 peripherals/external/oled \
 peripherals/external/oled/fonts \
-peripherals/external \
 peripherals/internal \
 

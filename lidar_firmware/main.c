@@ -25,12 +25,13 @@
 #include "peripherals/external/tf_mini_s_lidar.h"
 #include "peripherals/external/oled/SH1122_oled.h"
 #include "peripherals/external/stepper.h"
+#include "peripherals/external/encoder.h"
 
 extern const Task_Handle lidar_sample_tsk_hdl; //Task for sample lidar OK
 extern const Task_Handle step_tsk_hdl; //Task for stepper OK
 extern const Task_Handle oled_display_tsk_hdl; //Task for OLED OK
 extern const Task_Handle pc_data_tx_tsk_hdl; //Task for UART transmit OK
-extern const Task_Handle task_wait_tsk_hdl; //Task for waiting when S is pressed OK
+extern const Task_Handle wait_task_tsk_hdl; //Task for waiting when S is pressed OK
 
 extern const Semaphore_Handle lidar_sample_delay_sem; //Semaphore used for delays between lidar sampling events OK
 extern const Semaphore_Handle step_to_sample_sem; //Semaphore used for synchronized stepper and sample tasks OK
@@ -45,7 +46,7 @@ Mailbox_Handle angle_to_pc_mailbox; //Mailbox to pass angle to PC OK
 Mailbox_Handle stop_lidar_task_mailbox; //Mailbox to pass "stop" argument to lidar task OK
 Mailbox_Handle stop_step_task_mailbox; //Mailbox to pass "stop" argument to step task OK
 
-void task_wait()
+void wait_task()
 {
     bool stop = false; //intermediate stop to stop the execution of the task OK
 
@@ -271,6 +272,7 @@ int main()
     i2c_init(); //initialize I2C MP
     spi_init(4000000UL); //initialize SPI MP
     stepper_init(); //initialize stepper OK
+    encoder_init();
 
     //create mailboxes for communication between TSKs OK
     distance_to_oled_mailbox = Mailbox_create(2 * sizeof(uint16_t), 1, NULL, NULL);

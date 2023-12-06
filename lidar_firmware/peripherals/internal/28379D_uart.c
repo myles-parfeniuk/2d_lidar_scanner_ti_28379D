@@ -20,8 +20,8 @@ void uart_init(uint32_t baud_rate)
     GpioCtrlRegs.GPBPUD.bit.GPIO43 = 0; //enable pullup
     GpioCtrlRegs.GPBQSEL1.bit.GPIO43 |= 0x3U; //set asychronous qualification mode (SCI module performs clock sync)
 
-    //GPIO 42, rx_pin setup
-    GpioCtrlRegs.GPBMUX1.bit.GPIO42 |= 0x3U;
+    //GPIO 42, tx_pin setup
+    GpioCtrlRegs.GPBMUX1.bit.GPIO42 |= 0x3U; //mux SCIA_TX to GPIO_43
     GpioCtrlRegs.GPBGMUX1.bit.GPIO42 |= 0x3U;
     GpioCtrlRegs.GPBPUD.bit.GPIO42 = 0;
     GpioCtrlRegs.GPBQSEL1.bit.GPIO42 |= 0x3U;
