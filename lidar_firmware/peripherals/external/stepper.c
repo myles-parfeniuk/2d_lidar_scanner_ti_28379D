@@ -40,33 +40,32 @@ void stepper_init(void){
     XintRegs.XINT1CR.bit.ENABLE = 1; // Enable XINT1 interrupt
     InputXbarRegs.INPUT4SELECT = 0; // Select XBar input to Input4 output as gpio 0
 
-    initialized = 0;
+    initialized = 0; //not initialized yet, thus need to take steps till ISR
 
-    EDIS;
+    EDIS; //EALLOW
 }
 
-uint16_t stepper_step(uint16_t steps)
+uint16_t stepper_step(uint16_t steps) //take a step
 {
-    uint16_t i = 0;
-    float rads_moved = 0.0;
+    uint16_t i = 0; //intermediate val for "for"
+    float rads_moved = 0.0; //how many rads are moved - to be converted to int as mailbox may not support floats
 
-    for(i = 0; i < steps; i++)
+    for(i = 0; i < steps; i++) //toggle as many times as specified
     {
-        GpioDataRegs.GPASET.bit.GPIO25 |= 1;
-        delay_task_ticks(80U, step_delay_sem);
-        GpioDataRegs.GPACLEAR.bit.GPIO25 |= 1;
+        GpioDataRegs.GPASET.bit.GPIO25 |= 1;//toggle
+        delay_task_ticks(80U, step_delay_sem);//wait - made by MP
+        GpioDataRegs.GPACLEAR.bit.GPIO25 |= 1;//toggle
 
-        if(i != steps - 1)
-            delay_task_ticks(80U, step_delay_sem);
-        num_steps++;
+        if(i != steps - 1) //wait after toggle
+            delay_task_ticks(80U, step_delay_sem); //wait again, avoids the jerk of the motor due to staying low while lidar is taking a sample
+        num_steps++; //make a step
 
     }
 
-    rads_moved = 2.0*M_PI*1000.0;
+    rads_moved = 2.0*M_PI*1000.0; //calculate angle in rads
     rads_moved = rads_moved  / (float)run_average_steps;
     rads_moved = rads_moved * (float)num_steps;
-    return (uint16_t)(round(rads_moved));
-    //return (uint16_t)(round(((2.0*M_PI*1000)/(float)run_window[num_runs])*(float)num_steps));
+    return (uint16_t)(round(rads_moved)); //pass the angle back
 
 }
 
@@ -75,30 +74,30 @@ void ir_sensor_ISR(void) //XINT1 ISR, XINT1 is interrupt number 35
     EALLOW; //allow access to protected registers
     XintRegs.XINT1CR.bit.ENABLE = 0; // Disable XINT1 interrupt
     if (initialized == 0){
-        initialized = 1;
-        Semaphore_post (zero_sem);
+        initialized = 1; //once sensor is hit - initialize
+        Semaphore_post (zero_sem); //zeroed
     }
     else
     {
 
-        run_window[num_runs] = num_steps;
-        num_steps = 0;
-        num_runs++;
+        run_window[num_runs] = num_steps; //assign the number of steps into the window for averaging
+        num_steps = 0; //make it 0
+        num_runs++; //shift to the next numrun
 
-        run_average_steps = ((run_window[0]+run_window[1]+run_window[2]+run_window[3]+run_window[4])/5.0);
+        run_average_steps = ((run_window[0]+run_window[1]+run_window[2]+run_window[3]+run_window[4])/5.0); //average number of steps
 
 
 
         if (num_runs > 5){
-            num_runs = 0;
+            num_runs = 0; //reset when hit 5
         }
     }
     XintRegs.XINT1CR.bit.ENABLE = 1; // Enable XINT1 interrupt
-    EDIS; //disallow access to protected register
+    EDIS; //EALLOW
 }
 
 
-void stepper_zero(){
+void stepper_zero(){ //take steps until initialized
     int angle;
     while(!initialized)
     {

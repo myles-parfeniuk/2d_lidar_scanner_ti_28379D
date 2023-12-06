@@ -21,10 +21,12 @@
 
 #define LSP_CLK_FREQ 50000000U
 #define MAX_RX_STR_BYTES 99
-
+static volatile char tx_charr;
+static volatile bool stop;
 extern const Semaphore_Handle uart_tx_sem; //Semaphore used for synchronization of UART transmitting events
 extern const Swi_Handle uart_rx_swi_hdl; //SWI handle associated with SWI used for servicing UART receive events
 
+extern const Semaphore_Handle task_wait_sem, task_resume_sem;
 /***********************************************************************************
 *
 * uart_init

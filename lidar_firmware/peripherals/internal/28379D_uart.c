@@ -10,7 +10,7 @@
 
 void uart_init(uint32_t baud_rate)
 {
-    uint32_t baud_reg_val = ((LSP_CLK_FREQ / (baud_rate * 8U)) - 1U);
+    uint32_t baud_reg_val = ((LSP_CLK_FREQ / (baud_rate * 8U)) - 1U); //page 2330 - manual uses this formula
 
     EALLOW; //allow writes to protected registers
     CpuSysRegs.PCLKCR7.bit.SCI_A = 1; //enable SCIA module
@@ -34,9 +34,9 @@ void uart_init(uint32_t baud_rate)
     //reset rx fifo
     SciaRegs.SCIFFRX.bit.RXFIFORESET = 0;
     SciaRegs.SCIFFRX.bit.RXFIFORESET = 1;
-    //reset transmit and receive channels
+    //reset transmit channel
     SciaRegs.SCIFFTX.bit.SCIRST = 0;
-    SciaRegs.SCIFFTX.bit.SCIRST = 1;
+    SciaRegs.SCIFFTX.bit.SCIRST = 1; //no reset for RX OK
 
     SciaRegs.SCIFFTX.bit.SCIFFENA = 1; //enable FIFOs
 
@@ -48,7 +48,7 @@ void uart_init(uint32_t baud_rate)
     /*config SCIA module for:
      *
      * - sysclk/4 input clock (default 200MHz/4 = 50MHz)
-     * - [baurate]baud
+     * - [baudrate]baud
      * - 8 bit word length
      * - one stop bit
      * - no parity
@@ -71,6 +71,8 @@ void uart_init(uint32_t baud_rate)
     //perform soft reset to clear flags
     SciaRegs.SCICTL1.bit.SWRESET = 0;
     SciaRegs.SCICTL1.bit.SWRESET = 1U;
+    SciaRegs.SCIFFRX.bit.RXFFINTCLR = 1; //clear RXFFINT flag
+
 
     SciaRegs.SCIFFRX.bit.RXFFIL = 1; //set RXFFINT level (RXFFINT asserted when receive FIFO contains one or more words)
     SciaRegs.SCIFFRX.bit.RXFFIENA = 1; //enable FIFO receive interrupt (RXFFINT)
@@ -82,14 +84,14 @@ void uart_init(uint32_t baud_rate)
 
 void uart_tx_char(char tx_char)
 {
-    SciaRegs.SCIFFTX.bit.TXFFIL = 0; //set TXFFINT level (TXFFINT asserted when Transmit FIFO is empty)
+    SciaRegs.SCIFFTX.bit.TXFFIL = 0x10; //set TXFFINT level (TXFFINT asserted when Transmit FIFO is empty)
     SciaRegs.SCIFFTX.bit.TXFFIENA = 1; //enable FIFO transmit interrupt (TXFFINT)
-
+    tx_charr = tx_char;
     //wait for HWI to post send semaphore
     Semaphore_pend(uart_tx_sem, 5U);
-
     //write next byte to transmit
-    SciaRegs.SCITXBUF.bit.TXDT = tx_char;
+
+
 
 
 }
@@ -134,6 +136,7 @@ void uart_rx_SWI(void)
 {
     static char rx_str[100];
     static Uint8 index = 0;
+    static bool tasks_stopped = false;
 
     //only receive up to 100 chars, reset index otherwise
     if(index >= MAX_RX_STR_BYTES)
@@ -148,16 +151,40 @@ void uart_rx_SWI(void)
     if(rx_str[index-1] == '\r' || rx_str[index-1] == '\n')
     {
         rx_str[index-1] = '\0'; //add null key to terminate string
+
+        //check for start and stop commands:
+        if (rx_str[0] == 's')
+        {
+            if(!tasks_stopped)
+            {
+                tasks_stopped = true;
+                Semaphore_post(task_wait_sem); //stop scanning tasks
+            }
+        }
+
+        if (rx_str[0] == 'r'){
+            if(tasks_stopped)
+            {
+                tasks_stopped = false;
+                Semaphore_post(task_resume_sem); //resume scanning tasks
+            }
+        }
         index  = 0; //reset index
 
-        //post any SWIs or semaphores here
+        //perform soft reset to clear flags
+        SciaRegs.SCICTL1.bit.SWRESET = 0;
+        SciaRegs.SCICTL1.bit.SWRESET = 1U;
     }
+
+
 }
 
 void uart_tx_handler_ISR(void)
 {
     SciaRegs.SCIFFTX.bit.TXFFIENA = 0; //disable FIFO transmit interrupt (TXFFINT)
+    SciaRegs.SCITXBUF.bit.TXDT = tx_charr;
     Semaphore_post(uart_tx_sem);
+
 }
 
 void uart_rx_handler_ISR(void)
