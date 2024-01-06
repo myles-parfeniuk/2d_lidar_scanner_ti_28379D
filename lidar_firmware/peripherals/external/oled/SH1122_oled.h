@@ -1,6 +1,26 @@
 #ifndef SH1122_OLED_H_
 #define SH1122_OLED_H_
 
+/***********************************************************************************
+ * SSH1122.h
+ * Custom OLED driver based off of mikhail tsaryov's driver located here:
+ * https://github.com/mikhail-tsaryov/SH1122-STM32-HAL-Driver
+ *
+ * Using his driver as a reference significantly decreased development time; however,
+ * please note a substantial amount of time went into both porting it from the STM32 HAL
+ * based drivers he was using over to the F28379D utilized in this class, as well as
+ * making substantial improvements and additions.
+ *
+ * Some notable changes besides the core SPI driver port include the addition of
+ * frame, rectangle, and progress bar functions, and a re-worked method for character
+ * decoding using a look up table implemented in SH1122_fonts.h
+ *
+ *
+ * Author:    Myles Parfeniuk
+ * Date:      10/09/2023
+ * Modified:  10/09/2023
+ *********************************************************************************/
+
 //C standard library includes
 #include <math.h>
 #include <stdarg.h>
@@ -38,7 +58,7 @@
 #define OLED_ASSRT_DATA GpioDataRegs.GPDSET.bit.GPIO124 = 1
 #define OLED_ASSRT_CMD    GpioDataRegs.GPDCLEAR.bit.GPIO124 = 1
 
-//colors
+//intensity levels of the OLED (16 shades of gray are available)
 typedef enum
 {
     oled_intens_0 = 0x00,

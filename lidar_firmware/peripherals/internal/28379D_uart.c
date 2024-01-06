@@ -84,16 +84,12 @@ void uart_init(uint32_t baud_rate)
 
 void uart_tx_char(char tx_char)
 {
-    SciaRegs.SCIFFTX.bit.TXFFIL = 0x10; //set TXFFINT level (TXFFINT asserted when Transmit FIFO is empty)
-    SciaRegs.SCIFFTX.bit.TXFFIENA = 1; //enable FIFO transmit interrupt (TXFFINT)
+    SciaRegs.SCIFFTX.bit.TXFFIL = 0x10; //set TXFFINT level to 16 words OK
+    SciaRegs.SCIFFTX.bit.TXFFIENA = 1; //enable FIFO transmit interrupt
     tx_charr = tx_char;
     //wait for HWI to post send semaphore
     Semaphore_pend(uart_tx_sem, 5U);
     //write next byte to transmit
-
-
-
-
 }
 
 void uart_tx_str(const char *format, ...)

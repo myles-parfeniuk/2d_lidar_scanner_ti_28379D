@@ -3,6 +3,16 @@
 
 #include "fonts/SH1122_font_f10x16f.h"
 #include "fonts/SH1122_font_f6x8_mono.h"
+/***********************************************************************************
+ * SSH1122_fonts.h
+ *
+ * Module used to decode chars when writing string to OLED display. Uses the correct
+ * look-up table based off which font is passed to draw function.
+ *
+ * Author:    Myles Parfeniuk
+ * Date:      10/09/2023
+ * Modified:  10/09/2023
+ *********************************************************************************/
 
 typedef enum
 {

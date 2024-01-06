@@ -1627,6 +1627,7 @@ static const char_map_t f10x16f_lut[f10x16f_CHAR_COUNT] =
 
 char_map_t *f10x16f_decode_char(Uint8 character)
 {
+    //access LUT
     if(character >= ' ' && character <= '~') //if character between valid table range
         return (char_map_t *)(f10x16f_lut + ((Uint8)(character - ' '))); //calculate correct index and return pointer to map
     else

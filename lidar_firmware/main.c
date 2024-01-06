@@ -46,6 +46,7 @@ Mailbox_Handle angle_to_pc_mailbox; //Mailbox to pass angle to PC OK
 Mailbox_Handle stop_lidar_task_mailbox; //Mailbox to pass "stop" argument to lidar task OK
 Mailbox_Handle stop_step_task_mailbox; //Mailbox to pass "stop" argument to step task OK
 
+//task used to stop or start scanning tasks when commands are receieved over UART
 void wait_task()
 {
     bool stop = false; //intermediate stop to stop the execution of the task OK
@@ -69,6 +70,7 @@ void wait_task()
         Semaphore_post(wait_to_lidar_sem); //post wait_to_lidar OK
     }
 }
+
 void step_task()
 {
     bool stop = false; //intermediate stop to stop the execution of the task OK
@@ -220,7 +222,7 @@ void oled_display_task()
     oled_draw_rectangle(2, 2, OLED_WIDTH - 2, OLED_HEIGHT - 2, oled_intens_2);
     oled_draw_string(100, (20), oled_intens_15, font_f10x16f ,"ZEROING"); //display Zeroing until LED is hit OK
     oled_send_buffer(); //display OK
-    Semaphore_pend(zero_sem, BIOS_WAIT_FOREVER); //Wait till semaphore is posted
+    Semaphore_pend(zero_sem, BIOS_WAIT_FOREVER); //Wait till semaphore is posted OK
 
 
     while(1)
